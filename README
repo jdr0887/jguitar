@@ -1,0 +1,14 @@
+jGuitar
+==========
+
+Fork of TuxGuitar...implemented in JavaFX
+
+Build
+=====
+
+mvn clean install
+
+Run
+===
+
+java -jar jguitar-1.0-SNAPSHOT-jar-with-dependencies.jar 

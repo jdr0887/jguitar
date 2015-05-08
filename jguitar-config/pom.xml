@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+			     http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>com.kiluet</groupId>
+    <artifactId>jguitar</artifactId>
+    <version>0.0.1-SNAPSHOT</version>    
+  </parent>
+  <name>jGuitar :: Config</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.kiluet.jguitar</groupId>
+  <artifactId>jguitar-config</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <build>
+    <plugins>
+      <plugin>
+	<artifactId>maven-antrun-plugin</artifactId>
+	<executions>
+	  <execution>
+	    <id>0</id>
+	    <phase>validate</phase>
+	    <configuration>
+	      <tasks>
+		<delete file="${basedir}/src/main/resources/com/kiluet/jguitar/config/jguitar.properties" />
+		<touch file="${basedir}/src/main/resources/com/kiluet/jguitar/config/jguitar.properties" mkdirs="true" />
+		<echo file="${basedir}/src/main/resources/com/kiluet/jguitar/config/jguitar.properties" append="true">
+version=${project.version}
+		</echo>
+	      </tasks>
+	    </configuration>
+	    <goals>
+	      <goal>run</goal>
+	    </goals>
+	  </execution>
+	</executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

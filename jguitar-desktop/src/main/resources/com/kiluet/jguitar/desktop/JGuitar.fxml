@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleButton?>
+
+<BorderPane prefHeight="600" prefWidth="1200" stylesheets="@JGuitar.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="com.kiluet.jguitar.desktop.JGuitarController">
+  <fx:define>
+    <ToggleGroup fx:id="beatDurationTypeGroup" />
+    <ToggleGroup fx:id="modeToggleGroup" />
+    <ToggleGroup fx:id="voiceToggleGroup" />
+  </fx:define>
+  <top>
+    <MenuBar BorderPane.alignment="CENTER">
+      <menus>
+        <Menu mnemonicParsing="false" text="File">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doNew" text="New" />
+            <MenuItem mnemonicParsing="false" onAction="#doOpen" text="Open" />
+            <MenuItem mnemonicParsing="false" onAction="#doOpenURL" text="Open URL" />
+            <SeparatorMenuItem />
+            <MenuItem mnemonicParsing="false" onAction="#doSave" text="Save" />
+            <MenuItem mnemonicParsing="false" onAction="#doSaveAs" text="Save As" />
+            <SeparatorMenuItem />
+            <Menu mnemonicParsing="false" text="File">
+            </Menu>
+            <MenuItem mnemonicParsing="false" onAction="#doImport" text="Import" />
+            <MenuItem mnemonicParsing="false" onAction="#doExport" text="Export" />
+            <SeparatorMenuItem />
+            <MenuItem mnemonicParsing="false" onAction="#doExit" text="Exit" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Edit">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
+            <MenuItem mnemonicParsing="false" onAction="#doRedo" text="Redo" />
+            <SeparatorMenuItem />
+            <RadioMenuItem mnemonicParsing="false" onAction="#doSelectionMode" text="Selection Mode" toggleGroup="$modeToggleGroup" />
+            <RadioMenuItem mnemonicParsing="false" onAction="#doScoreEditionMode" text="Score Edition Mode" toggleGroup="$modeToggleGroup" />
+            <RadioMenuItem mnemonicParsing="false" onAction="#doSharpFlatMode" text="Sharp Flat Mode" toggleGroup="$modeToggleGroup" />
+            <SeparatorMenuItem />
+            <RadioMenuItem mnemonicParsing="false" onAction="#doSelectVoice1" text="Select Voice 1" toggleGroup="$voiceToggleGroup" />
+            <RadioMenuItem mnemonicParsing="false" onAction="#doSelectVoice2" text="Select Voice 2" toggleGroup="$voiceToggleGroup" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="View">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
+            <SeparatorMenuItem />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Composition">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
+            <SeparatorMenuItem />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Track">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
+            <SeparatorMenuItem />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Measure">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
+            <SeparatorMenuItem />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Beat">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
+            <SeparatorMenuItem />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Marker">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
+            <SeparatorMenuItem />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Player">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
+            <SeparatorMenuItem />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Tools">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
+            <SeparatorMenuItem />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#showAbout" text="About" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+  </top>
+  <center>
+    <SplitPane dividerPositions="0.20,0.80" orientation="HORIZONTAL">
+      <BorderPane fx:id="leftPane" styleClass="songPane">
+        <center>
+          <ListView fx:id="songListView" />
+        </center>
+        <bottom>
+          <ToolBar>
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button text="|&lt;&lt;" />
+            <Button text="&gt;" />
+            <Button text="&gt;&gt;|" />
+            <Pane HBox.hgrow="ALWAYS" />
+          </ToolBar>
+        </bottom>
+      </BorderPane>
+      <BorderPane fx:id="rightPane">
+        <top>
+          <ToolBar fx:id="controlsToolBar">
+            <ToggleButton text="1" fx:id="wholeDurationButton" toggleGroup="$beatDurationTypeGroup" />
+            <ToggleButton text="1/2" fx:id="halfDurationButton" toggleGroup="$beatDurationTypeGroup" />
+            <ToggleButton text="1/4" fx:id="quarterDurationButton" toggleGroup="$beatDurationTypeGroup" />
+            <ToggleButton text="1/8" fx:id="eighthDurationButton" toggleGroup="$beatDurationTypeGroup" />
+            <ToggleButton text="1/16" fx:id="sixteenthDurationButton" toggleGroup="$beatDurationTypeGroup" />
+            <ToggleButton text="1/32" fx:id="thritySecondDurationButton" toggleGroup="$beatDurationTypeGroup" />
+            <ToggleButton text="1/64" fx:id="sixtyFouthDurationButton" toggleGroup="$beatDurationTypeGroup" />
+            <Separator />
+            <Button text="||:" />
+            <Button text=":||" />
+            <Separator />
+            <Button text="+ Track" />
+            <Button text="- Track" />
+            <Separator />
+            <Button text="+ Measure" />
+            <Button text="- Measure" />
+          </ToolBar>
+        </top>
+        <center>
+          <ScrollPane styleClass="rightScrollPane" vbarPolicy="ALWAYS" hbarPolicy="ALWAYS">
+            <VBox fx:id="songBox" styleClass="songBox" />
+          </ScrollPane>
+        </center>
+        <bottom>
+          <ToolBar>
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button text="|&lt;&lt;" fx:id="previousMeasureButton">
+              <tooltip>
+                <Tooltip text="Go To Previous Measure" />
+              </tooltip>
+            </Button>
+            <Button text="&lt;&lt;" fx:id="slowerVelocityButton">
+              <tooltip>
+                <Tooltip text="Play 5% Slower" />
+              </tooltip>
+            </Button>
+            <Button text="&gt;" fx:id="playSongButton" onAction="#doPlaySong">
+              <tooltip>
+                <Tooltip text="Play" />
+              </tooltip>
+            </Button>
+            <Button text="&gt;&gt;" fx:id="fasterVelocityButton">
+              <tooltip>
+                <Tooltip text="Play 5% Faster" />
+              </tooltip>
+            </Button>
+            <Button text="&gt;&gt;|" fx:id="nextMeasureButton">
+              <tooltip>
+                <Tooltip text="Go To Next Measure" />
+              </tooltip>
+            </Button>
+            <Pane HBox.hgrow="ALWAYS" />
+          </ToolBar>
+        </bottom>
+      </BorderPane>
+    </SplitPane>
+  </center>
+</BorderPane>
+
+
+
+

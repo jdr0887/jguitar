@@ -18,8 +18,8 @@
       <artifactId>controlsfx</artifactId>
     </dependency>    
     <dependency>
-      <groupId>com.kiluet.jguitar</groupId>
-      <artifactId>jguitar-api</artifactId>
+      <groupId>com.kiluet.jguitar.jguitar-dao</groupId>
+      <artifactId>jguitar-dao-jpa</artifactId>
     </dependency>
     <dependency>
       <groupId>com.kiluet.jguitar</groupId>

@@ -4,16 +4,8 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.ToggleButton?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.Tab?>
 
 <BorderPane prefHeight="600" prefWidth="1200" stylesheets="@JGuitar.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="com.kiluet.jguitar.desktop.JGuitarController">
@@ -34,8 +26,6 @@
             <MenuItem mnemonicParsing="false" onAction="#doSave" text="Save" />
             <MenuItem mnemonicParsing="false" onAction="#doSaveAs" text="Save As" />
             <SeparatorMenuItem />
-            <Menu mnemonicParsing="false" text="File">
-            </Menu>
             <MenuItem mnemonicParsing="false" onAction="#doImport" text="Import" />
             <MenuItem mnemonicParsing="false" onAction="#doExport" text="Export" />
             <SeparatorMenuItem />
@@ -55,67 +45,21 @@
             <RadioMenuItem mnemonicParsing="false" onAction="#doSelectVoice2" text="Select Voice 2" toggleGroup="$voiceToggleGroup" />
           </items>
         </Menu>
-        <Menu mnemonicParsing="false" text="View">
-          <items>
-            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
-            <SeparatorMenuItem />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Composition">
-          <items>
-            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
-            <SeparatorMenuItem />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Track">
-          <items>
-            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
-            <SeparatorMenuItem />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Measure">
-          <items>
-            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
-            <SeparatorMenuItem />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Beat">
-          <items>
-            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
-            <SeparatorMenuItem />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Marker">
-          <items>
-            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
-            <SeparatorMenuItem />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Player">
-          <items>
-            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
-            <SeparatorMenuItem />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Tools">
-          <items>
-            <MenuItem mnemonicParsing="false" onAction="#doUndo" text="Undo" />
-            <SeparatorMenuItem />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Help">
-          <items>
-            <MenuItem mnemonicParsing="false" onAction="#showAbout" text="About" />
-          </items>
-        </Menu>
       </menus>
     </MenuBar>
   </top>
   <center>
-    <SplitPane dividerPositions="0.20,0.80" orientation="HORIZONTAL">
+    <SplitPane dividerPositions="0.25,0.75" orientation="HORIZONTAL">
       <BorderPane fx:id="leftPane" styleClass="songPane">
         <center>
-          <ListView fx:id="songListView" />
+          <TabPane>
+            <Tab text="Songs">
+              <TreeTableView fx:id="songsTreeTableView" />
+            </Tab>
+            <Tab text="Scales">
+              <TreeTableView fx:id="scalesTreeTableView" />
+            </Tab>
+          </TabPane>
         </center>
         <bottom>
           <ToolBar>
@@ -130,6 +74,17 @@
       <BorderPane fx:id="rightPane">
         <top>
           <ToolBar fx:id="controlsToolBar">
+            <Label text="Tempo:" />
+            <ComboBox layoutX="15.0" layoutY="33.0" prefWidth="90.0">
+              <items>
+                <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="120" />
+                  <String fx:value="100" />
+                  <String fx:value="80" />
+                </FXCollections>
+              </items>
+            </ComboBox>
+            <Separator />
             <ToggleButton text="1" fx:id="wholeDurationButton" toggleGroup="$beatDurationTypeGroup" />
             <ToggleButton text="1/2" fx:id="halfDurationButton" toggleGroup="$beatDurationTypeGroup" />
             <ToggleButton text="1/4" fx:id="quarterDurationButton" toggleGroup="$beatDurationTypeGroup" />
@@ -150,7 +105,7 @@
         </top>
         <center>
           <ScrollPane styleClass="rightScrollPane" vbarPolicy="ALWAYS" hbarPolicy="ALWAYS">
-            <VBox fx:id="songBox" styleClass="songBox" />
+            <VBox fx:id="notationBox" styleClass="notationBox" />
           </ScrollPane>
         </center>
         <bottom>

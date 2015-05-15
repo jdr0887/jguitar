@@ -39,7 +39,7 @@ root {
 	-fx-fit-to-height: true; 	 	
 }
 
-.songBox {
+.notationBox {
 	-fx-background-color: white;
 	-fx-fill-width: true;
 	-fx-padding: 10;

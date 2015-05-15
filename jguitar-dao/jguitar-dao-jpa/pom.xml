@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>com.kiluet.jguitar</groupId>
+    <artifactId>jguitar-dao</artifactId>
+    <version>0.0.1-SNAPSHOT</version>    
+  </parent>
+  <name>jGuitar :: DAO :: JPA</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.kiluet.jguitar.jguitar-dao</groupId>
+  <artifactId>jguitar-dao-jpa</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kiluet.jguitar.jguitar-dao</groupId>
+      <artifactId>jguitar-dao-api</artifactId>
+    </dependency>
+  </dependencies>
+</project>

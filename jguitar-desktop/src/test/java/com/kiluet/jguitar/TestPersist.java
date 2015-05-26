@@ -14,8 +14,6 @@ import com.kiluet.jguitar.dao.JGuitarDAOManager;
 import com.kiluet.jguitar.dao.model.KeyType;
 import com.kiluet.jguitar.dao.model.Scale;
 import com.kiluet.jguitar.dao.model.ScaleType;
-import com.kiluet.jguitar.desktop.scales.PersistInstrumentsRunnable;
-import com.kiluet.jguitar.desktop.scales.PersistPentatonicScalesRunnable;
 
 public class TestPersist {
 

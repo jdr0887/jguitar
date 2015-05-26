@@ -14,11 +14,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kiluet.jguitar.PersistHeptatonicScalesRunnable;
+import com.kiluet.jguitar.PersistInstrumentsRunnable;
+import com.kiluet.jguitar.PersistPentatonicScalesRunnable;
+import com.kiluet.jguitar.PersistTemplateRunnable;
 import com.kiluet.jguitar.config.Config;
-import com.kiluet.jguitar.desktop.scales.PersistHeptatonicScalesRunnable;
-import com.kiluet.jguitar.desktop.scales.PersistInstrumentsRunnable;
-import com.kiluet.jguitar.desktop.scales.PersistPentatonicScalesRunnable;
-import com.kiluet.jguitar.desktop.scales.PersistTemplateRunnable;
 
 public class Main extends Application {
 

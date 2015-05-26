@@ -2,9 +2,11 @@ package com.kiluet.jguitar.desktop;
 
 import java.util.List;
 
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.layout.BorderPane;
+import javafx.geometry.VPos;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
@@ -22,7 +24,7 @@ import com.kiluet.jguitar.dao.model.Measure;
 import com.kiluet.jguitar.dao.model.Note;
 import com.kiluet.jguitar.util.MIDINumber2NoteConverter;
 
-public class MeasurePane extends BorderPane {
+public class MeasurePane extends GridPane {
 
     private final Logger logger = LoggerFactory.getLogger(MeasurePane.class);
 
@@ -48,20 +50,19 @@ public class MeasurePane extends BorderPane {
     }
 
     private void init() {
-        setStyle("-fx-padding: 10 0 10 0;");
+        setStyle("-fx-padding: 0;");
+        setAlignment(Pos.BASELINE_CENTER);
+        setMaxHeight(180);
+        setMinHeight(180);
 
-        // Text measureIndexText = new Text(measureIndex.toString());
-        // measureIndexText.setStyle("-fx-font-size: 8; -fx-fill: red; -fx-padding: 0; ");
-        // setTop(measureIndexText);
-        // setAlignment(measureIndexText, Pos.CENTER_LEFT);
+        Text measureIndexText = new Text(measureIndex.toString());
+        measureIndexText.setStyle("-fx-font-size: 8; -fx-fill: red; -fx-padding: 0;");
+        add(measureIndexText, 0, 0, 2, 1);
+        setHalignment(measureIndexText, HPos.LEFT);
 
-        GridPane gridPane = new GridPane();
-        // gridPane.setStyle("-fx-border-color: red;");
-
-        RowConstraints rowConstraints = new RowConstraints();
-        rowConstraints.setMinHeight(20);
-        rowConstraints.setMaxHeight(20);
-        rowConstraints.setVgrow(Priority.ALWAYS);
+        if (measureIndex == 1) {
+            setMargin(measureIndexText, new Insets(0, 0, 0, 15));
+        }
 
         int columnOffset = 1;
 
@@ -69,7 +70,7 @@ public class MeasurePane extends BorderPane {
             for (InstrumentString is : instrumentStrings) {
                 Text note = new Text(MIDINumber2NoteConverter.getNote(is.getPitch()));
                 note.setStyle("-fx-font-size: 9;");
-                gridPane.add(note, 0, is.getString() - 1);
+                add(note, 0, is.getString());
                 GridPane.setMargin(note, new Insets(0, 5, 0, 0));
             }
         }
@@ -78,12 +79,50 @@ public class MeasurePane extends BorderPane {
 
             Beat beat = measure.getBeats().get(i);
 
+            for (int j = 0; j < instrumentStrings.size(); j++) {
+
+                StackPane stackPane = new StackPane();
+                // -fx-border-color: red;
+                stackPane.setStyle("-fx-padding: 0;");
+
+                Line line = new Line(0, j + 1 * 10, 40, j + 1 * 10);
+                line.setStroke(Color.web("lightgray"));
+
+                NoteTextField noteTextField = new NoteTextField();
+                noteTextField
+                        .setStyle("-fx-alignment: center; -fx-background-color: transparent; -fx-background-insets: 0; -fx-background-radius: 0; -fx-padding: 0; -fx-pref-column-count: 1; -fx-max-height: 20; -fx-max-width: 20; -fx-font-size: 10;");
+
+                stackPane.getChildren().addAll(line, noteTextField);
+
+                for (Note note : beat.getNotes()) {
+
+                    if (note.getString() == j + 1) {
+                        noteTextField = (NoteTextField) stackPane.getChildren().get(1);
+                        noteTextField.setText(note.getValue().toString());
+                        columnOffset++;
+                    }
+
+                }
+
+                add(stackPane, i + 1, j + 1);
+                RowConstraints rowConstraints = new RowConstraints();
+                rowConstraints.setMinHeight(20);
+                rowConstraints.setMaxHeight(20);
+                rowConstraints.setVgrow(Priority.ALWAYS);
+                getRowConstraints().add(rowConstraints);
+
+            }
+
             switch (beat.getDuration()) {
                 case WHOLE:
                     jguitarController.getWholeDurationButton().setSelected(true);
                     break;
                 case HALF:
                     jguitarController.getHalfDurationButton().setSelected(true);
+                    Line line = new Line(0, 0, 0, 15);
+                    line.setStrokeWidth(1);
+                    add(line, beat.getNumber(), instrumentStrings.size() + 1);
+                    setHalignment(line, HPos.CENTER);
                     break;
                 case QUARTER:
                     jguitarController.getQuarterDurationButton().setSelected(true);
@@ -105,52 +144,24 @@ public class MeasurePane extends BorderPane {
                     break;
             }
 
-            for (int j = 1; j <= instrumentStrings.size(); j++) {
-
-                StackPane stackPane = new StackPane();
-                // stackPane.setStyle("-fx-border-color: red;");
-
-                Line line = new Line(0, j * 10, 40, j * 10);
-                line.setStroke(Color.web("lightgray"));
-
-                NoteTextField noteTextField = new NoteTextField();
-                noteTextField
-                        .setStyle("-fx-background-color: transparent; -fx-background-insets: 0; -fx-background-radius: 0; -fx-padding: 0; -fx-pref-column-count: 2; -fx-max-height: 20; -fx-max-width: 20; -fx-font-size: 10;");
-
-                stackPane.getChildren().addAll(line, noteTextField);
-
-                for (Note note : beat.getNotes()) {
-
-                    if (note.getString() == j) {
-                        noteTextField = (NoteTextField) stackPane.getChildren().get(1);
-                        noteTextField.setText(note.getValue().toString());
-                        columnOffset++;
-                    }
-
-                }
-
-                gridPane.add(stackPane, i + 2, j - 1);
-                gridPane.getRowConstraints().add(j - 1, rowConstraints);
-
-            }
         }
 
         if (measureIndex == 1) {
 
             Line line = new Line(0, 0, 0, (instrumentStrings.size() - 1) * 20 - 3);
             line.setStrokeWidth(4);
-            gridPane.add(line, 1, 0, 1, instrumentStrings.size());
+            add(line, 1, 1, 1, instrumentStrings.size());
 
             line = new Line(0, 0, 0, (instrumentStrings.size() - 1) * 20);
             line.setStrokeWidth(1);
-            gridPane.add(line, 2, 0, 1, instrumentStrings.size());
-            GridPane.setMargin(line, new Insets(0, 0, 0, 1));
+            add(line, 1, 1, 1, instrumentStrings.size());
+            setMargin(line, new Insets(0, 0, 0, 5));
 
         } else {
 
             Line line = new Line(0, 0, 0, (instrumentStrings.size() - 1) * 20);
             line.setStrokeWidth(1);
-            gridPane.add(line, 1, 0, 1, instrumentStrings.size());
+            add(line, 1, 1, 1, instrumentStrings.size());
 
         }
 
@@ -158,16 +169,14 @@ public class MeasurePane extends BorderPane {
 
             Line line = new Line(0, 0, 0, (instrumentStrings.size() - 1) * 20);
             line.setStrokeWidth(1);
-            gridPane.add(line, columnOffset + 1, 0, 1, instrumentStrings.size());
-            GridPane.setMargin(line, new Insets(0, 1, 0, 0));
+            add(line, columnOffset + 1, 1, 1, instrumentStrings.size());
+            setMargin(line, new Insets(0, 1, 0, 0));
 
             line = new Line(0, 0, 0, (instrumentStrings.size() - 1) * 20 - 3);
             line.setStrokeWidth(4);
-            gridPane.add(line, columnOffset + 2, 0, 1, instrumentStrings.size());
+            add(line, columnOffset + 2, 1, 1, instrumentStrings.size());
 
         }
-
-        setCenter(gridPane);
 
     }
 }

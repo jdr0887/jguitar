@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -23,6 +23,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -30,6 +31,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -145,6 +147,7 @@ public class JGuitarController extends BorderPane implements Initializable {
 
         TreeTableColumn<String, String> scalesIterationsTreeTableColumn = new TreeTableColumn<>("X");
         scalesIterationsTreeTableColumn.setPrefWidth(30);
+        scalesIterationsTreeTableColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
 
         TreeTableColumn<String, String> scalesProgressTreeTableColumn = new TreeTableColumn<>("Progress");
         scalesProgressTreeTableColumn.setPrefWidth(120);
@@ -154,38 +157,7 @@ public class JGuitarController extends BorderPane implements Initializable {
         scalesTreeTableView.setShowRoot(false);
         scalesTreeTableView.setRoot(scalesTreeTableDummyRoot);
         scalesTreeTableView.getSelectionModel().selectedItemProperty()
-                .addListener(new ChangeListener<TreeItem<String>>() {
-
-                    @Override
-                    public void changed(ObservableValue<? extends TreeItem<String>> observable,
-                            TreeItem<String> oldValue, TreeItem<String> newValue) {
-                        if (newValue != null && newValue.isLeaf()) {
-                            String name = newValue.getValue();
-                            String key = newValue.getParent().getValue();
-                            String type = newValue.getParent().getParent().getValue();
-
-                            List<Track> tracks = new ArrayList<Track>();
-                            try {
-                                Scale scale = new Scale();
-                                scale.setName(name);
-                                scale.setKey(KeyType.valueOf(key));
-                                scale.setType(ScaleType.valueOf(type.toUpperCase()));
-                                List<Scale> scales = daoMgr.getDaoBean().getScaleDAO().findByExample(scale);
-                                if (scales != null && !scales.isEmpty()) {
-                                    tracks.add(scales.get(0).getTrack());
-                                }
-                            } catch (JGuitarDAOException e) {
-                                e.printStackTrace();
-                            }
-
-                            if (!tracks.isEmpty()) {
-                                notationBox.getChildren().clear();
-                                notationBox.getChildren().add(drawSongPane(tracks));
-                            }
-                        }
-                    }
-
-                });
+                .addListener(new ScalesTreeTableViewChangeListener(this));
         scalesTreeTableView.getSelectionModel().selectFirst();
 
         TreeItem<String> songsTreeTableDummyRoot = new TreeItem<String>();
@@ -215,43 +187,20 @@ public class JGuitarController extends BorderPane implements Initializable {
         songsTreeTableView.setShowRoot(false);
         songsTreeTableView.setRoot(songsTreeTableDummyRoot);
         songsTreeTableView.getSelectionModel().selectedItemProperty()
-                .addListener(new ChangeListener<TreeItem<String>>() {
-
-                    @Override
-                    public void changed(ObservableValue<? extends TreeItem<String>> observable,
-                            TreeItem<String> oldValue, TreeItem<String> newValue) {
-                        if (newValue != null && newValue.isLeaf()) {
-                            List<Track> tracks = new ArrayList<Track>();
-                            try {
-                                List<Song> songs = daoMgr.getDaoBean().getSongDAO().findByName(newValue.getValue());
-                                if (songs != null && !songs.isEmpty()) {
-                                    tracks.addAll(daoMgr.getDaoBean().getTrackDAO().findBySongId(songs.get(0).getId()));
-                                }
-                            } catch (JGuitarDAOException e) {
-                                e.printStackTrace();
-                            }
-
-                            if (!tracks.isEmpty()) {
-                                notationBox.getChildren().clear();
-                                notationBox.getChildren().add(drawSongPane(tracks));
-                            }
-                        }
-                    }
-
-                });
+                .addListener(new SongTreeTableViewChangeListener(this));
         songsTreeTableView.getSelectionModel().selectFirst();
 
     }
 
-    private GridPane drawSongPane(List<Track> tracks) {
+    public TilePane drawSongPane(List<Track> tracks) {
         JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
-        GridPane gridPane = new GridPane();
-        gridPane.setVgap(10);
+        TilePane tilePane = new TilePane(Orientation.VERTICAL);
 
         for (int i = 0; i < tracks.size(); i++) {
             Track track = tracks.get(i);
 
             HBox trackBox = new HBox();
+            trackBox.setStyle("-fx-padding: 0;");
             // trackBox.setStyle("-fx-border-color: black;");
 
             List<Measure> measures = new ArrayList<Measure>();
@@ -263,17 +212,15 @@ public class JGuitarController extends BorderPane implements Initializable {
 
             for (int j = 0; j < measures.size(); j++) {
                 Measure measure = measures.get(j);
-
                 MeasurePane measurePane = new MeasurePane(this, j + 1, track.getMeasures().size(), measure, track
                         .getInstrument().getStrings());
                 trackBox.getChildren().add(measurePane);
             }
 
-            gridPane.add(trackBox, 0, i);
-            GridPane.setHgrow(trackBox, Priority.ALWAYS);
+            tilePane.getChildren().add(trackBox);
 
         }
-        return gridPane;
+        return tilePane;
     }
 
     @FXML
@@ -321,9 +268,6 @@ public class JGuitarController extends BorderPane implements Initializable {
             HBox trackBox = (HBox) trackNode;
             for (Node measureNode : trackBox.getChildren()) {
                 MeasurePane measurePane = (MeasurePane) measureNode;
-                GridPane measureGridPane = (GridPane) measurePane.getCenter();
-                System.out.println(measureGridPane.getRowConstraints().size());
-                // StackPane stackPane = measureGridPane.getChildren().get(0);
                 MidiChannel[] channels = synthesizer.getChannels();
                 try {
                     channels[26].noteOn(60, 80);

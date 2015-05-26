@@ -18,7 +18,8 @@ public class MIDINumber2NoteConverter {
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 if (number.equals(data[i][j])) {
-                    return columns[j];
+                    // return String.format("%s%d", columns[j], i);
+                    return String.format("%s", columns[j]);
                 }
             }
         }

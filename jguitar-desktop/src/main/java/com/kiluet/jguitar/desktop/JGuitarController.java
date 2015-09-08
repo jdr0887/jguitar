@@ -5,36 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
-import javafx.scene.control.cell.TextFieldTreeTableCell;
-import javafx.scene.input.InputEvent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
@@ -47,7 +20,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.dialog.ExceptionDialog;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.JGuitarDAOManager;
@@ -57,8 +32,41 @@ import com.kiluet.jguitar.dao.model.Scale;
 import com.kiluet.jguitar.dao.model.ScaleType;
 import com.kiluet.jguitar.dao.model.Song;
 import com.kiluet.jguitar.dao.model.Track;
+import com.kiluet.jguitar.util.MIDINumber2NoteConverter;
+
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Orientation;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.ToolBar;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.scene.input.InputEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class JGuitarController extends BorderPane implements Initializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(JGuitarController.class);
 
     private Sequencer sequencer;
 
@@ -67,6 +75,12 @@ public class JGuitarController extends BorderPane implements Initializable {
     private Synthesizer synthesizer;
 
     private Track track;
+
+    @FXML
+    private Label dateLabel;
+
+    @FXML
+    private Label statusLabel;
 
     @FXML
     private BorderPane leftPane;
@@ -108,11 +122,13 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        dateLabel.setText(DateFormatUtils.ISO_DATE_FORMAT.format(new Date()));
+        
         JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
         TreeItem<String> scalesTreeTableDummyRoot = new TreeItem<String>();
         try {
-            TreeItem<String> heptatonicScalesRoot = new TreeItem<String>(StringUtils.capitalize(ScaleType.HEPTATONIC
-                    .toString().toLowerCase()));
+            TreeItem<String> heptatonicScalesRoot = new TreeItem<String>(
+                    StringUtils.capitalize(ScaleType.HEPTATONIC.toString().toLowerCase()));
 
             for (KeyType keyType : KeyType.values()) {
 
@@ -122,8 +138,8 @@ public class JGuitarController extends BorderPane implements Initializable {
                 heptatonicScalesRoot.getChildren().add(heptatonicScaleKeyTreeItem);
             }
 
-            TreeItem<String> pentatonicScalesRoot = new TreeItem<String>(StringUtils.capitalize(ScaleType.PENTATONIC
-                    .toString().toLowerCase()));
+            TreeItem<String> pentatonicScalesRoot = new TreeItem<String>(
+                    StringUtils.capitalize(ScaleType.PENTATONIC.toString().toLowerCase()));
 
             for (KeyType keyType : KeyType.values()) {
 
@@ -141,8 +157,8 @@ public class JGuitarController extends BorderPane implements Initializable {
 
         TreeTableColumn<String, String> scalesNameTreeTableColumn = new TreeTableColumn<>("Name");
         scalesNameTreeTableColumn.setPrefWidth(150);
-        scalesNameTreeTableColumn
-                .setCellValueFactory((TreeTableColumn.CellDataFeatures<String, String> param) -> new ReadOnlyStringWrapper(
+        scalesNameTreeTableColumn.setCellValueFactory(
+                (TreeTableColumn.CellDataFeatures<String, String> param) -> new ReadOnlyStringWrapper(
                         param.getValue().getValue()));
 
         TreeTableColumn<String, String> scalesIterationsTreeTableColumn = new TreeTableColumn<>("X");
@@ -172,8 +188,8 @@ public class JGuitarController extends BorderPane implements Initializable {
 
         TreeTableColumn<String, String> songsNameTreeTableColumn = new TreeTableColumn<>("Name");
         songsNameTreeTableColumn.setPrefWidth(150);
-        songsNameTreeTableColumn
-                .setCellValueFactory((TreeTableColumn.CellDataFeatures<String, String> param) -> new ReadOnlyStringWrapper(
+        songsNameTreeTableColumn.setCellValueFactory(
+                (TreeTableColumn.CellDataFeatures<String, String> param) -> new ReadOnlyStringWrapper(
                         param.getValue().getValue()));
 
         TreeTableColumn<String, String> songsIterationsTreeTableColumn = new TreeTableColumn<>("X");
@@ -212,8 +228,8 @@ public class JGuitarController extends BorderPane implements Initializable {
 
             for (int j = 0; j < measures.size(); j++) {
                 Measure measure = measures.get(j);
-                MeasurePane measurePane = new MeasurePane(this, j + 1, track.getMeasures().size(), measure, track
-                        .getInstrument().getStrings());
+                MeasurePane measurePane = new MeasurePane(this, j + 1, track.getMeasures().size(), measure,
+                        track.getInstrument().getStrings());
                 trackBox.getChildren().add(measurePane);
             }
 
@@ -242,7 +258,6 @@ public class JGuitarController extends BorderPane implements Initializable {
 
         playSongButton.setText("||");
 
-        GridPane gridPane = (GridPane) notationBox.getChildren().get(0);
         javax.sound.midi.Track track;
         try {
             if (synthesizer == null) {
@@ -264,15 +279,40 @@ public class JGuitarController extends BorderPane implements Initializable {
             synthesizer.loadInstrument(synthesizer.getDefaultSoundbank().getInstruments()[26]);
         }
 
-        for (Node trackNode : gridPane.getChildren()) {
+        TilePane tilePane = (TilePane) notationBox.getChildren().get(0);
+        for (Node trackNode : tilePane.getChildren()) {
             HBox trackBox = (HBox) trackNode;
             for (Node measureNode : trackBox.getChildren()) {
                 MeasurePane measurePane = (MeasurePane) measureNode;
+
                 MidiChannel[] channels = synthesizer.getChannels();
+                logger.info("channels.length: {}", channels.length);
                 try {
-                    channels[26].noteOn(60, 80);
-                    Thread.sleep(100);
-                    channels[26].noteOn(60, 80);
+
+                    ObservableList<Node> measurePaneChildren = measurePane.getChildren();
+                    int string = 0;
+                    for (Node measurePaneNode : measurePaneChildren) {
+                        if (measurePaneNode instanceof StackPane) {
+                            StackPane stackPane = (StackPane) measurePaneNode;
+
+                            for (Node stackPaneNode : stackPane.getChildren()) {
+                                // beat
+                                if (stackPaneNode instanceof NoteTextField) {
+                                    NoteTextField noteTextField = (NoteTextField) stackPaneNode;
+                                    if (StringUtils.isNotEmpty(noteTextField.getText())) {
+                                        System.out.println(noteTextField.getText());
+                                        Integer note = MIDINumber2NoteConverter.getGuitarNote(string,
+                                                Integer.valueOf(noteTextField.getText()));
+                                        channels[0].noteOn(note, 80);
+                                        Thread.sleep(1000);
+                                        channels[0].noteOff(note, 80);
+                                    }
+                                }
+                            }
+                            string++;
+                        }
+                    }
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -342,8 +382,11 @@ public class JGuitarController extends BorderPane implements Initializable {
             // songBox.getChildren().clear();
             // songBox.getChildren().add(drawSongPane(song));
         } catch (FileNotFoundException | JAXBException e) {
-            ExceptionDialog dialog = new ExceptionDialog(e);
-            dialog.show();
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("ERROR: JGuitarDAOException");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
         }
     }
 

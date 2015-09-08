@@ -1,12 +1,13 @@
 package com.kiluet.jguitar.desktop;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
-import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.dialog.Dialogs;
 
 public class NewController {
 
@@ -52,8 +53,11 @@ public class NewController {
         if (StringUtils.isEmpty(errorMessage)) {
             return true;
         } else {
-            Dialogs.create().title("Invalid Fields").masthead("Please correct invalid fields").message(errorMessage)
-                    .showError();
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Invalid Fields");
+            alert.setContentText("Please correct invalid fields");
+            alert.showAndWait();
             return false;
         }
     }

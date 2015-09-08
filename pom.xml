@@ -32,9 +32,8 @@
     <commons.cli.version>1.2</commons.cli.version>
     <commons.pool.version>1.5.6</commons.pool.version>
     <slf4j.version>1.7.12</slf4j.version>
-    <openjpa.version>2.3.0</openjpa.version>
+    <openjpa.version>2.4.0</openjpa.version>
     <derby.version>10.11.1.1</derby.version>
-    <controlsfx.version>8.20.8</controlsfx.version>
   </properties>
   <licenses>    
     <license>
@@ -49,11 +48,6 @@
       	<groupId>org.apache.derby</groupId>
       	<artifactId>derby</artifactId>
       	<version>${derby.version}</version>
-      </dependency>
-      <dependency>
-	<groupId>org.controlsfx</groupId>
-	<artifactId>controlsfx</artifactId>
-      	<version>${controlsfx.version}</version>
       </dependency>
       <dependency>
       	<groupId>com.kiluet.jguitar.jguitar-dao</groupId>
@@ -99,36 +93,6 @@
 	<groupId>org.apache.openjpa</groupId>
 	<artifactId>openjpa</artifactId>
 	<version>${openjpa.version}</version>
-      </dependency>
-      <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-core</artifactId>
-	<version>${spring.version}</version>
-      </dependency>
-      <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-beans</artifactId>
-	<version>${spring.version}</version>
-      </dependency>
-      <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-context</artifactId>
-	<version>${spring.version}</version>
-      </dependency>
-      <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-context-support</artifactId>
-	<version>${spring.version}</version>
-      </dependency>
-      <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-tx</artifactId>
-	<version>${spring.version}</version>
-      </dependency>
-      <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-orm</artifactId>
-	<version>${spring.version}</version>
       </dependency>
       <dependency>
 	<groupId>org.slf4j</groupId>

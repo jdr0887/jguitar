@@ -40,11 +40,11 @@ public class Main extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        ExecutorService es = Executors.newSingleThreadExecutor();
-        es.submit(new PersistInstrumentsRunnable()).get();
-        es.submit(new PersistTemplateRunnable()).get();
-        es.submit(new PersistHeptatonicScalesRunnable()).get();
-        es.submit(new PersistPentatonicScalesRunnable()).get();
+        ExecutorService es = Executors.newFixedThreadPool(4);
+        es.submit(new PersistInstrumentsRunnable());
+        es.submit(new PersistTemplateRunnable());
+        es.submit(new PersistHeptatonicScalesRunnable());
+        es.submit(new PersistPentatonicScalesRunnable());
         es.shutdown();
         es.awaitTermination(10, TimeUnit.SECONDS);
     }

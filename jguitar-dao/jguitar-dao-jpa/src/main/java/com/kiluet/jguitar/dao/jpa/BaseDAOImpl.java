@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kiluet.jguitar.dao.BaseDAO;
 import com.kiluet.jguitar.dao.JGuitarDAOException;
-import com.kiluet.jguitar.dao.model.Persistable;
+import com.kiluet.jguitar.dao.Persistable;
 
 public abstract class BaseDAOImpl<T extends Persistable, ID extends Serializable> implements BaseDAO<T, ID> {
 
@@ -30,7 +30,7 @@ public abstract class BaseDAOImpl<T extends Persistable, ID extends Serializable
 
     @Override
     public Long save(T entity) throws JGuitarDAOException {
-        logger.info("ENTERING save(T)");
+        logger.debug("ENTERING save(T)");
         entityManager.getTransaction().begin();
         if (!entityManager.contains(entity) && entity.getId() != null) {
             entity = entityManager.merge(entity);
@@ -44,7 +44,7 @@ public abstract class BaseDAOImpl<T extends Persistable, ID extends Serializable
 
     @Override
     public void delete(T entity) throws JGuitarDAOException {
-        logger.info("ENTERING delete(T)");
+        logger.debug("ENTERING delete(T)");
         entityManager.getTransaction().begin();
         T foundEntity = entityManager.find(getPersistentClass(), entity.getId());
         entityManager.remove(foundEntity);
@@ -67,7 +67,7 @@ public abstract class BaseDAOImpl<T extends Persistable, ID extends Serializable
 
     @Override
     public T findById(ID id) throws JGuitarDAOException {
-        logger.info("ENTERING findById(T)");
+        logger.debug("ENTERING findById(T)");
         T ret = entityManager.find(getPersistentClass(), id);
         return ret;
     }

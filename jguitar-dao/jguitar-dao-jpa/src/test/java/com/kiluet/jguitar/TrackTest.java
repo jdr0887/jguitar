@@ -23,26 +23,45 @@ public class TrackTest {
         try {
             Song song = daoMgr.getDaoBean().getSongDAO().findByName("Template").get(0);
 
-            Map<Integer, List<Beat>> trackBeatMap = new HashMap<Integer, List<Beat>>();
-
-            for (Track track : song.getTracks()) {
-                if (trackBeatMap.get(track.getNumber()) == null) {
-                    trackBeatMap.put(track.getNumber(), new LinkedList<Beat>());
-                }
-            }
+            Map<String, List<Beat>> beatMap = new HashMap<String, List<Beat>>();
 
             for (Track track : song.getTracks()) {
                 for (Measure measure : track.getMeasures()) {
                     for (Beat beat : measure.getBeats()) {
-                        trackBeatMap.get(track.getNumber()).add(beat);
+                        String key = String.format("%d_%d", measure.getNumber(), beat.getNumber());
+                        // System.out.println(key);
+                        if (beatMap.get(key) == null) {
+                            beatMap.put(key, new LinkedList<Beat>());
+                        }
+                        beatMap.get(key).add(beat);
                     }
                 }
             }
 
-            for (Integer key : trackBeatMap.keySet()) {
-                System.out.println(key);
-                for (Beat beat : trackBeatMap.get(key)) {
-                    System.out.println(beat);
+            for (String key : beatMap.keySet()) {
+                for (Beat beat : beatMap.get(key)) {
+                    System.out.println(beat.getMeasure().getTrack().getId());
+                }
+            }
+
+        } catch (JGuitarDAOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void trackBeatTest2() {
+
+        JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
+        try {
+            Song song = daoMgr.getDaoBean().getSongDAO().findByName("Template").get(0);
+
+            for (Measure measure : song.getTracks().get(0).getMeasures()) {
+                List<Beat> beats = daoMgr.getDaoBean().getBeatDAO().findBySongIdAndMeasureNumber(song.getId(),
+                        measure.getNumber());
+                for (Beat beat : beats) {
+                    System.out.println(beat.getMeasure().getTrack().getId());
                 }
             }
 

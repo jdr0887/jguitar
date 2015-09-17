@@ -118,7 +118,7 @@ public class PersistTemplateRunnable extends AbstractPersistRunnable {
         createNote(beat, 3, 3);
 
         beat = createBeat(measure, DurationType.HALF, 2);
-        createNote(beat, 4, 4);
+        createNote(beat, 4, 3);
 
         persistedSongs = daoMgr.getDaoBean().getSongDAO().findByName("Template");
         Song persistedSong = persistedSongs.get(0);

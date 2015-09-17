@@ -51,15 +51,6 @@ public class JGuitarDAOManager {
                     String.format("jdbc:derby:db;user=%s;password=jguitar", userName));
         }
 
-        properties.put("openjpa.jdbc.MappingDefaults",
-                "ForeignKeyDeleteAction=restrict, JoinForeignKeyDeleteAction=restrict");
-        properties.put("openjpa.jdbc.SchemaFactory", "native(ForeignKeys=true)");
-        properties.put("openjpa.ConnectionFactoryProperties", "printParameters=true");
-        properties.put("openjpa.Log", "DefaultLevel=WARN, Runtime=WARN, Tool=INFO, SQL=TRACE");
-        properties.put("openjpa.Multithreaded", "true");
-        properties.put("openjpa.DataCache", "false");
-        properties.put("openjpa.QueryCache", "false");
-
         this.emf = Persistence.createEntityManagerFactory("jguitar", properties);
         this.em = emf.createEntityManager();
 

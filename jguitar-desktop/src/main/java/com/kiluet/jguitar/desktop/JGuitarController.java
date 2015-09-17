@@ -184,14 +184,18 @@ public class JGuitarController extends BorderPane implements Initializable {
     @FXML
     private void doPlaySong(final ActionEvent event) {
 
-        if (playSongButton.getText().equals("||") && player.isPlaying()) {
-            // stop playing
-            playSongButton.setText(">");
-            player.pause();
-        } else if (playSongButton.getText().equals(">") && player.isPaused()) {
-            // start playing
+        if (playSongButton.getText().equals(">")) {
             playSongButton.setText("||");
-            player.play();
+            if (player.isPaused()) {
+                // start playing
+                player.play();
+            } 
+        } else {
+            playSongButton.setText(">");
+            if (player.isPlaying()) {
+                // stop playing
+                player.pause();
+            } 
         }
 
     }

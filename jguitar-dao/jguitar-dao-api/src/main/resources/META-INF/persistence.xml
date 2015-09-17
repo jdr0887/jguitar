@@ -19,6 +19,13 @@
     <properties>
       <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" />
       <property name="openjpa.jdbc.DBDictionary" value="derby(NextSequenceQuery=VALUES NEXT VALUE FOR {0})" />
+      <property name="openjpa.jdbc.MappingDefaults" value="ForeignKeyDeleteAction=restrict, JoinForeignKeyDeleteAction=restrict" />
+      <property name="openjpa.jdbc.SchemaFactory" value="native(ForeignKeys=true)" />
+      <property name="openjpa.ConnectionFactoryProperties" value="printParameters=true" />
+      <property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=WARN, Tool=INFO, SQL=INFO" />
+      <property name="openjpa.Multithreaded" value="true" />
+      <property name="openjpa.DataCache" value="false" />
+      <property name="openjpa.QueryCache" value="false" />
     </properties>
   </persistence-unit>
 

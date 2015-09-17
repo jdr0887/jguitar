@@ -73,8 +73,8 @@ public class MeasurePane extends GridPane {
             for (InstrumentString instrumentString : instrumentStrings) {
 
                 StackPane stackPane = new StackPane();
-                stackPane.setId(String.format("StackPane_%d_%d_%d", measure.getNumber(), beat.getNumber(),
-                        instrumentString.getString()));
+                stackPane.setId(String.format("StackPane_%d_%d_%d_%d", measure.getTrack().getId(), measure.getNumber(),
+                        beat.getNumber(), instrumentString.getString()));
 
                 // -fx-border-color: red;
                 stackPane.setMinHeight(20);
@@ -85,8 +85,8 @@ public class MeasurePane extends GridPane {
                 line.setStroke(Color.web("lightgray"));
 
                 NoteTextField noteTextField = new NoteTextField();
-                noteTextField.setId(String.format("NoteTextField_%d_%d_%d", measure.getNumber(), beat.getNumber(),
-                        instrumentString.getString()));
+                noteTextField.setId(String.format("NoteTextField_%d_%d_%d_%d", measure.getTrack().getId(),
+                        measure.getNumber(), beat.getNumber(), instrumentString.getString()));
 
                 stackPane.getChildren().addAll(line, noteTextField);
 

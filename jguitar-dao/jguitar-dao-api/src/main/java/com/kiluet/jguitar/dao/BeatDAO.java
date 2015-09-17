@@ -8,4 +8,7 @@ public interface BeatDAO extends BaseDAO<Beat, Long> {
 
     public abstract List<Beat> findByMeasureId(Long measureId) throws JGuitarDAOException;
 
+    public abstract List<Beat> findBySongIdAndMeasureNumber(Long songId, Integer measureNumber)
+            throws JGuitarDAOException;
+
 }

@@ -49,6 +49,7 @@ public class TrackPane extends GridPane {
 
         List<InstrumentString> instrumentStrings = track.getInstrument().getStrings();
 
+        String noteTextFieldLookupFormat = "#NoteTextField_%d_%d_%d_%d";
         // navigation
         for (Measure measure : track.getMeasures()) {
 
@@ -56,8 +57,8 @@ public class TrackPane extends GridPane {
 
                 for (InstrumentString instrumentString : instrumentStrings) {
 
-                    String currentNoteTextFieldId = String.format("#NoteTextField_%d_%d_%d", measure.getNumber(),
-                            beat.getNumber(), instrumentString.getString());
+                    String currentNoteTextFieldId = String.format(noteTextFieldLookupFormat, track.getId(),
+                            measure.getNumber(), beat.getNumber(), instrumentString.getString());
 
                     NoteTextField noteTextField = (NoteTextField) lookup(currentNoteTextFieldId);
                     noteTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -71,11 +72,12 @@ public class TrackPane extends GridPane {
                                     case RIGHT:
                                         String rightOfNoteTextFieldId = null;
                                         if (beat.getNumber() == measure.getBeats().size()) {
-                                            rightOfNoteTextFieldId = String.format("#NoteTextField_%d_%d_%d",
-                                                    measure.getNumber() + 1, 1, instrumentString.getString());
+                                            rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                                    track.getId(), measure.getNumber() + 1, 1,
+                                                    instrumentString.getString());
                                         } else {
-                                            rightOfNoteTextFieldId = String.format("#NoteTextField_%d_%d_%d",
-                                                    measure.getNumber(), beat.getNumber() + 1,
+                                            rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                                    track.getId(), measure.getNumber(), beat.getNumber() + 1,
                                                     instrumentString.getString());
                                         }
                                         logger.info(rightOfNoteTextFieldId);
@@ -84,27 +86,27 @@ public class TrackPane extends GridPane {
                                     case LEFT:
                                         String leftOfNoteTextFieldId = null;
                                         if (beat.getNumber() - 1 == 0) {
-                                            leftOfNoteTextFieldId = String.format("#NoteTextField_%d_%d_%d",
-                                                    measure.getNumber() - 1, measure.getBeats().size(),
+                                            leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                                    track.getId(), measure.getNumber() - 1, measure.getBeats().size(),
                                                     instrumentString.getString());
                                         } else {
-                                            leftOfNoteTextFieldId = String.format("#NoteTextField_%d_%d_%d",
-                                                    measure.getNumber(), beat.getNumber() - 1,
+                                            leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                                    track.getId(), measure.getNumber(), beat.getNumber() - 1,
                                                     instrumentString.getString());
                                         }
                                         logger.info(leftOfNoteTextFieldId);
                                         noteTextField = (NoteTextField) lookup(leftOfNoteTextFieldId);
                                         break;
                                     case UP:
-                                        String upOfNoteTextFieldId = String.format("#NoteTextField_%d_%d_%d",
-                                                measure.getNumber(), beat.getNumber(),
+                                        String upOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                                track.getId(), measure.getNumber(), beat.getNumber(),
                                                 instrumentString.getString() - 1);
                                         logger.info(upOfNoteTextFieldId);
                                         noteTextField = (NoteTextField) lookup(upOfNoteTextFieldId);
                                         break;
                                     case DOWN:
-                                        String downOfNoteTextFieldId = String.format("#NoteTextField_%d_%d_%d",
-                                                measure.getNumber(), beat.getNumber(),
+                                        String downOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                                track.getId(), measure.getNumber(), beat.getNumber(),
                                                 instrumentString.getString() + 1);
                                         logger.info(downOfNoteTextFieldId);
                                         noteTextField = (NoteTextField) lookup(downOfNoteTextFieldId);

@@ -4,17 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.sound.midi.MidiChannel;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
-import javax.sound.midi.Soundbank;
-import javax.sound.midi.Synthesizer;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -27,39 +22,31 @@ import org.slf4j.LoggerFactory;
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.JGuitarDAOManager;
 import com.kiluet.jguitar.dao.model.KeyType;
-import com.kiluet.jguitar.dao.model.Measure;
 import com.kiluet.jguitar.dao.model.Scale;
 import com.kiluet.jguitar.dao.model.ScaleType;
 import com.kiluet.jguitar.dao.model.Song;
 import com.kiluet.jguitar.dao.model.Track;
-import com.kiluet.jguitar.util.MIDINumber2NoteConverter;
+import com.kiluet.jguitar.desktop.components.ScalePane;
+import com.kiluet.jguitar.desktop.components.SongPane;
+import com.kiluet.jguitar.player.SongPlayer;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
-import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -68,37 +55,24 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(JGuitarController.class);
 
-    private Sequencer sequencer;
+    private SongPlayer player;
 
-    private Sequence sequence;
-
-    private Synthesizer synthesizer;
-
-    private Track track;
+    private Song song;
 
     @FXML
     private Label dateLabel;
 
     @FXML
+    private Menu scalesMenu;
+
+    @FXML
     private Label statusLabel;
-
-    @FXML
-    private BorderPane leftPane;
-
-    @FXML
-    private BorderPane rightPane;
 
     @FXML
     private ToolBar controlsToolBar;
 
     @FXML
     private VBox notationBox;
-
-    @FXML
-    private TreeTableView<String> songsTreeTableView;
-
-    @FXML
-    private TreeTableView<String> scalesTreeTableView;
 
     @FXML
     private ListView<Track> trackListView;
@@ -123,120 +97,74 @@ public class JGuitarController extends BorderPane implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         dateLabel.setText(DateFormatUtils.ISO_DATE_FORMAT.format(new Date()));
-        
+
         JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
-        TreeItem<String> scalesTreeTableDummyRoot = new TreeItem<String>();
-        try {
-            TreeItem<String> heptatonicScalesRoot = new TreeItem<String>(
-                    StringUtils.capitalize(ScaleType.HEPTATONIC.toString().toLowerCase()));
 
-            for (KeyType keyType : KeyType.values()) {
-
-                TreeItem<String> heptatonicScaleKeyTreeItem = new TreeItem<String>(keyType.toString());
+        Map<String, Menu> menuMap = new HashMap<>();
+        for (KeyType keyType : KeyType.values()) {
+            menuMap.put(keyType.name(), new Menu(keyType.name()));
+        }
+        for (KeyType keyType : KeyType.values()) {
+            try {
                 List<Scale> scales = daoMgr.getDaoBean().getScaleDAO().findByKeyAndType(keyType, ScaleType.HEPTATONIC);
-                scales.forEach(p -> heptatonicScaleKeyTreeItem.getChildren().add(new TreeItem<String>(p.getName())));
-                heptatonicScalesRoot.getChildren().add(heptatonicScaleKeyTreeItem);
+                scales.forEach(p -> menuMap.get(keyType.name()).getItems().add(new MenuItem(p.getName()) {
+                    {
+                        setOnAction(e -> {
+                            try {
+                                Scale scale = daoMgr.getDaoBean().getScaleDAO().findById(p.getId());
+                                getNotationBox().getChildren().clear();
+                                getNotationBox().getChildren().add(new ScalePane(JGuitarController.this, scale));
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+                        });
+                    }
+                }));
+            } catch (JGuitarDAOException e) {
+                e.printStackTrace();
             }
+        }
+        Menu heptatonicMenu = new Menu(StringUtils.capitalize(ScaleType.HEPTATONIC.name().toLowerCase()));
+        menuMap.values().forEach(p -> heptatonicMenu.getItems().add(p));
+        scalesMenu.getItems().add(heptatonicMenu);
 
-            TreeItem<String> pentatonicScalesRoot = new TreeItem<String>(
-                    StringUtils.capitalize(ScaleType.PENTATONIC.toString().toLowerCase()));
-
-            for (KeyType keyType : KeyType.values()) {
-
-                TreeItem<String> pentatonicScaleKeyTreeItem = new TreeItem<String>(keyType.toString());
+        for (KeyType keyType : KeyType.values()) {
+            menuMap.put(keyType.name(), new Menu(keyType.name()));
+        }
+        for (KeyType keyType : KeyType.values()) {
+            try {
                 List<Scale> scales = daoMgr.getDaoBean().getScaleDAO().findByKeyAndType(keyType, ScaleType.PENTATONIC);
-                scales.forEach(p -> pentatonicScaleKeyTreeItem.getChildren().add(new TreeItem<String>(p.getName())));
-                pentatonicScalesRoot.getChildren().add(pentatonicScaleKeyTreeItem);
-
+                scales.forEach(p -> menuMap.get(keyType.name()).getItems().add(new MenuItem(p.getName()) {
+                    {
+                        setOnAction(e -> {
+                            try {
+                                Scale scale = daoMgr.getDaoBean().getScaleDAO().findById(p.getId());
+                                getNotationBox().getChildren().clear();
+                                getNotationBox().getChildren().add(new ScalePane(JGuitarController.this, scale));
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+                        });
+                    }
+                }));
+            } catch (JGuitarDAOException e) {
+                e.printStackTrace();
             }
+        }
+        Menu pentatonicMenu = new Menu(StringUtils.capitalize(ScaleType.PENTATONIC.name().toLowerCase()));
+        menuMap.values().forEach(p -> pentatonicMenu.getItems().add(p));
+        scalesMenu.getItems().add(pentatonicMenu);
 
-            scalesTreeTableDummyRoot.getChildren().addAll(heptatonicScalesRoot, pentatonicScalesRoot);
+        try {
+            this.song = daoMgr.getDaoBean().getSongDAO().findByName("Template").get(0);
+            getNotationBox().getChildren().clear();
+            SongPane songPane = new SongPane(JGuitarController.this, this.song);
+            getNotationBox().getChildren().add(songPane);
+            this.player = new SongPlayer(songPane);
         } catch (JGuitarDAOException e) {
             e.printStackTrace();
         }
 
-        TreeTableColumn<String, String> scalesNameTreeTableColumn = new TreeTableColumn<>("Name");
-        scalesNameTreeTableColumn.setPrefWidth(150);
-        scalesNameTreeTableColumn.setCellValueFactory(
-                (TreeTableColumn.CellDataFeatures<String, String> param) -> new ReadOnlyStringWrapper(
-                        param.getValue().getValue()));
-
-        TreeTableColumn<String, String> scalesIterationsTreeTableColumn = new TreeTableColumn<>("X");
-        scalesIterationsTreeTableColumn.setPrefWidth(30);
-        scalesIterationsTreeTableColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
-
-        TreeTableColumn<String, String> scalesProgressTreeTableColumn = new TreeTableColumn<>("Progress");
-        scalesProgressTreeTableColumn.setPrefWidth(120);
-
-        scalesTreeTableView.getColumns().addAll(scalesNameTreeTableColumn, scalesIterationsTreeTableColumn,
-                scalesProgressTreeTableColumn);
-        scalesTreeTableView.setShowRoot(false);
-        scalesTreeTableView.setRoot(scalesTreeTableDummyRoot);
-        scalesTreeTableView.getSelectionModel().selectedItemProperty()
-                .addListener(new ScalesTreeTableViewChangeListener(this));
-        scalesTreeTableView.getSelectionModel().selectFirst();
-
-        TreeItem<String> songsTreeTableDummyRoot = new TreeItem<String>();
-        try {
-            List<Song> potentialTemplateSong = daoMgr.getDaoBean().getSongDAO().findByName("Template");
-            Song template = potentialTemplateSong.get(0);
-            TreeItem<String> templateRoot = new TreeItem<String>(template.getName());
-            songsTreeTableDummyRoot.getChildren().add(templateRoot);
-        } catch (JGuitarDAOException e1) {
-            e1.printStackTrace();
-        }
-
-        TreeTableColumn<String, String> songsNameTreeTableColumn = new TreeTableColumn<>("Name");
-        songsNameTreeTableColumn.setPrefWidth(150);
-        songsNameTreeTableColumn.setCellValueFactory(
-                (TreeTableColumn.CellDataFeatures<String, String> param) -> new ReadOnlyStringWrapper(
-                        param.getValue().getValue()));
-
-        TreeTableColumn<String, String> songsIterationsTreeTableColumn = new TreeTableColumn<>("X");
-        songsIterationsTreeTableColumn.setPrefWidth(30);
-
-        TreeTableColumn<String, String> songsProgressTreeTableColumn = new TreeTableColumn<>("Progress");
-        songsProgressTreeTableColumn.setPrefWidth(120);
-
-        songsTreeTableView.getColumns().addAll(songsNameTreeTableColumn, songsIterationsTreeTableColumn,
-                songsProgressTreeTableColumn);
-        songsTreeTableView.setShowRoot(false);
-        songsTreeTableView.setRoot(songsTreeTableDummyRoot);
-        songsTreeTableView.getSelectionModel().selectedItemProperty()
-                .addListener(new SongTreeTableViewChangeListener(this));
-        songsTreeTableView.getSelectionModel().selectFirst();
-
-    }
-
-    public TilePane drawSongPane(List<Track> tracks) {
-        JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
-        TilePane tilePane = new TilePane(Orientation.VERTICAL);
-
-        for (int i = 0; i < tracks.size(); i++) {
-            Track track = tracks.get(i);
-
-            HBox trackBox = new HBox();
-            trackBox.setStyle("-fx-padding: 0;");
-            // trackBox.setStyle("-fx-border-color: black;");
-
-            List<Measure> measures = new ArrayList<Measure>();
-            try {
-                measures.addAll(daoMgr.getDaoBean().getMeasureDAO().findByTrackId(track.getId()));
-            } catch (JGuitarDAOException e) {
-                e.printStackTrace();
-            }
-
-            for (int j = 0; j < measures.size(); j++) {
-                Measure measure = measures.get(j);
-                MeasurePane measurePane = new MeasurePane(this, j + 1, track.getMeasures().size(), measure,
-                        track.getInstrument().getStrings());
-                trackBox.getChildren().add(measurePane);
-            }
-
-            tilePane.getChildren().add(trackBox);
-
-        }
-        return tilePane;
     }
 
     @FXML
@@ -256,80 +184,15 @@ public class JGuitarController extends BorderPane implements Initializable {
     @FXML
     private void doPlaySong(final ActionEvent event) {
 
-        playSongButton.setText("||");
-
-        javax.sound.midi.Track track;
-        try {
-            if (synthesizer == null) {
-                if ((synthesizer = MidiSystem.getSynthesizer()) == null) {
-                    System.out.println("getSynthesizer() failed!");
-                    return;
-                }
-            }
-            synthesizer.open();
-            sequencer = MidiSystem.getSequencer();
-            sequence = new Sequence(Sequence.PPQ, 10);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return;
+        if (playSongButton.getText().equals("||") && player.isPlaying()) {
+            // stop playing
+            playSongButton.setText(">");
+            player.pause();
+        } else if (playSongButton.getText().equals(">") && player.isPaused()) {
+            // start playing
+            playSongButton.setText("||");
+            player.play();
         }
-
-        Soundbank sb = synthesizer.getDefaultSoundbank();
-        if (sb != null) {
-            synthesizer.loadInstrument(synthesizer.getDefaultSoundbank().getInstruments()[26]);
-        }
-
-        TilePane tilePane = (TilePane) notationBox.getChildren().get(0);
-        for (Node trackNode : tilePane.getChildren()) {
-            HBox trackBox = (HBox) trackNode;
-            for (Node measureNode : trackBox.getChildren()) {
-                MeasurePane measurePane = (MeasurePane) measureNode;
-
-                MidiChannel[] channels = synthesizer.getChannels();
-                logger.info("channels.length: {}", channels.length);
-                try {
-
-                    ObservableList<Node> measurePaneChildren = measurePane.getChildren();
-                    int string = 0;
-                    for (Node measurePaneNode : measurePaneChildren) {
-                        if (measurePaneNode instanceof StackPane) {
-                            StackPane stackPane = (StackPane) measurePaneNode;
-
-                            for (Node stackPaneNode : stackPane.getChildren()) {
-                                // beat
-                                if (stackPaneNode instanceof NoteTextField) {
-                                    NoteTextField noteTextField = (NoteTextField) stackPaneNode;
-                                    if (StringUtils.isNotEmpty(noteTextField.getText())) {
-                                        System.out.println(noteTextField.getText());
-                                        Integer note = MIDINumber2NoteConverter.getGuitarNote(string,
-                                                Integer.valueOf(noteTextField.getText()));
-                                        channels[0].noteOn(note, 80);
-                                        Thread.sleep(1000);
-                                        channels[0].noteOff(note, 80);
-                                    }
-                                }
-                            }
-                            string++;
-                        }
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-        if (synthesizer != null) {
-            synthesizer.close();
-        }
-        if (sequencer != null) {
-            sequencer.close();
-        }
-        sequencer = null;
-        synthesizer = null;
-
-        playSongButton.setText(">");
 
     }
 
@@ -427,52 +290,20 @@ public class JGuitarController extends BorderPane implements Initializable {
         this.app = app;
     }
 
-    public Sequencer getSequencer() {
-        return sequencer;
+    public SongPlayer getPlayer() {
+        return player;
     }
 
-    public void setSequencer(Sequencer sequencer) {
-        this.sequencer = sequencer;
+    public void setPlayer(SongPlayer player) {
+        this.player = player;
     }
 
-    public Sequence getSequence() {
-        return sequence;
+    public Song getSong() {
+        return song;
     }
 
-    public void setSequence(Sequence sequence) {
-        this.sequence = sequence;
-    }
-
-    public Synthesizer getSynthesizer() {
-        return synthesizer;
-    }
-
-    public void setSynthesizer(Synthesizer synthesizer) {
-        this.synthesizer = synthesizer;
-    }
-
-    public Track getTrack() {
-        return track;
-    }
-
-    public void setTrack(Track track) {
-        this.track = track;
-    }
-
-    public BorderPane getLeftPane() {
-        return leftPane;
-    }
-
-    public void setLeftPane(BorderPane leftPane) {
-        this.leftPane = leftPane;
-    }
-
-    public BorderPane getRightPane() {
-        return rightPane;
-    }
-
-    public void setRightPane(BorderPane rightPane) {
-        this.rightPane = rightPane;
+    public void setSong(Song song) {
+        this.song = song;
     }
 
     public ToolBar getControlsToolBar() {
@@ -489,14 +320,6 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     public void setNotationBox(VBox notationBox) {
         this.notationBox = notationBox;
-    }
-
-    public TreeTableView<String> getPlaylistTreeTableView() {
-        return scalesTreeTableView;
-    }
-
-    public void setPlaylistTreeTableView(TreeTableView<String> playlistTreeTableView) {
-        this.scalesTreeTableView = playlistTreeTableView;
     }
 
     public ListView<Track> getTrackListView() {

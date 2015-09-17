@@ -15,6 +15,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.kiluet.jguitar.dao.Persistable;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Entity", propOrder = {})
 @XmlRootElement(name = "entity")

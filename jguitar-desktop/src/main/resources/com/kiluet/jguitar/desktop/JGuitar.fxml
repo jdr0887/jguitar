@@ -45,105 +45,83 @@
             <RadioMenuItem mnemonicParsing="false" onAction="#doSelectVoice2" text="Select Voice 2" toggleGroup="$voiceToggleGroup" />
           </items>
         </Menu>
+        <Menu fx:id="scalesMenu" mnemonicParsing="false" text="Scales" />
       </menus>
     </MenuBar>
   </top>
   <center>
-    <SplitPane dividerPositions="0.20,0.80" orientation="HORIZONTAL">
-      <BorderPane fx:id="leftPane" styleClass="songPane">
-        <center>
-          <TabPane>
-            <Tab text="Songs">
-              <TreeTableView fx:id="songsTreeTableView" />
-            </Tab>
-            <Tab text="Scales">
-              <TreeTableView fx:id="scalesTreeTableView" />
-            </Tab>
-          </TabPane>
-        </center>
-        <bottom>
-          <ToolBar>
-            <Pane HBox.hgrow="ALWAYS" />
-            <Button text="|&lt;&lt;" />
-            <Button text="&gt;" />
-            <Button text="&gt;&gt;|" />
-            <Pane HBox.hgrow="ALWAYS" />
-          </ToolBar>
-        </bottom>
-      </BorderPane>
-      <BorderPane fx:id="rightPane">
-        <top>
-          <ToolBar fx:id="controlsToolBar">
-            <Label text="Speed:" />
-            <ComboBox layoutX="15.0" layoutY="33.0" prefWidth="90.0">
-              <items>
-                <FXCollections fx:factory="observableArrayList">
-                  <String fx:value="100" />
-                  <String fx:value="90" />
-                  <String fx:value="80" />
-                  <String fx:value="70" />
-                  <String fx:value="60" />
-                  <String fx:value="50" />
-                </FXCollections>
-              </items>
-            </ComboBox>
-            <Separator />
-            <ToggleButton text="1" fx:id="wholeDurationButton" toggleGroup="$beatDurationTypeGroup" />
-            <ToggleButton text="1/2" fx:id="halfDurationButton" toggleGroup="$beatDurationTypeGroup" />
-            <ToggleButton text="1/4" fx:id="quarterDurationButton" toggleGroup="$beatDurationTypeGroup" />
-            <ToggleButton text="1/8" fx:id="eighthDurationButton" toggleGroup="$beatDurationTypeGroup" />
-            <ToggleButton text="1/16" fx:id="sixteenthDurationButton" toggleGroup="$beatDurationTypeGroup" />
-            <ToggleButton text="1/32" fx:id="thritySecondDurationButton" toggleGroup="$beatDurationTypeGroup" />
-            <ToggleButton text="1/64" fx:id="sixtyFouthDurationButton" toggleGroup="$beatDurationTypeGroup" />
-            <Separator />
-            <Button text="||:" />
-            <Button text=":||" />
-            <Separator />
-            <Button text="+ Track" />
-            <Button text="- Track" />
-            <Separator />
-            <Button text="+ Measure" />
-            <Button text="- Measure" />
-          </ToolBar>
-        </top>
-        <center>
-          <ScrollPane styleClass="rightScrollPane" vbarPolicy="ALWAYS" hbarPolicy="ALWAYS">
-            <VBox fx:id="notationBox" styleClass="notationBox" />
-          </ScrollPane>
-        </center>
-        <bottom>
-          <ToolBar>
-            <Pane HBox.hgrow="ALWAYS" />
-            <Button text="|&lt;&lt;" fx:id="previousMeasureButton">
-              <tooltip>
-                <Tooltip text="Go To Previous Measure" />
-              </tooltip>
-            </Button>
-            <Button text="&lt;&lt;" fx:id="slowerVelocityButton">
-              <tooltip>
-                <Tooltip text="Play 5% Slower" />
-              </tooltip>
-            </Button>
-            <Button text="&gt;" fx:id="playSongButton" onAction="#doPlaySong">
-              <tooltip>
-                <Tooltip text="Play" />
-              </tooltip>
-            </Button>
-            <Button text="&gt;&gt;" fx:id="fasterVelocityButton">
-              <tooltip>
-                <Tooltip text="Play 5% Faster" />
-              </tooltip>
-            </Button>
-            <Button text="&gt;&gt;|" fx:id="nextMeasureButton">
-              <tooltip>
-                <Tooltip text="Go To Next Measure" />
-              </tooltip>
-            </Button>
-            <Pane HBox.hgrow="ALWAYS" />
-          </ToolBar>
-        </bottom>
-      </BorderPane>
-    </SplitPane>
+    <BorderPane>
+      <top>
+        <ToolBar fx:id="controlsToolBar">
+          <Label text="Speed:" />
+          <ComboBox layoutX="15.0" layoutY="33.0" prefWidth="90.0">
+            <items>
+              <FXCollections fx:factory="observableArrayList">
+                <String fx:value="100" />
+                <String fx:value="90" />
+                <String fx:value="80" />
+                <String fx:value="70" />
+                <String fx:value="60" />
+                <String fx:value="50" />
+              </FXCollections>
+            </items>
+          </ComboBox>
+          <Separator />
+          <ToggleButton text="1" fx:id="wholeDurationButton" toggleGroup="$beatDurationTypeGroup" />
+          <ToggleButton text="1/2" fx:id="halfDurationButton" toggleGroup="$beatDurationTypeGroup" />
+          <ToggleButton text="1/4" fx:id="quarterDurationButton" toggleGroup="$beatDurationTypeGroup" />
+          <ToggleButton text="1/8" fx:id="eighthDurationButton" toggleGroup="$beatDurationTypeGroup" />
+          <ToggleButton text="1/16" fx:id="sixteenthDurationButton" toggleGroup="$beatDurationTypeGroup" />
+          <ToggleButton text="1/32" fx:id="thritySecondDurationButton" toggleGroup="$beatDurationTypeGroup" />
+          <ToggleButton text="1/64" fx:id="sixtyFouthDurationButton" toggleGroup="$beatDurationTypeGroup" />
+          <Separator />
+          <Button text="||:" />
+          <Button text=":||" />
+          <Separator />
+          <Button text="+ Track" />
+          <Button text="- Track" />
+          <Separator />
+          <Button text="+ Measure" />
+          <Button text="- Measure" />
+        </ToolBar>
+      </top>
+      <center>
+        <ScrollPane styleClass="rightScrollPane" vbarPolicy="ALWAYS" hbarPolicy="ALWAYS">
+          <VBox fx:id="notationBox" styleClass="notationBox" />
+        </ScrollPane>
+      </center>
+      <bottom>
+        <ToolBar>
+          <Pane HBox.hgrow="ALWAYS" />
+          <Button text="|&lt;&lt;" fx:id="previousMeasureButton">
+            <tooltip>
+              <Tooltip text="Go To Previous Measure" />
+            </tooltip>
+          </Button>
+          <Button text="&lt;&lt;" fx:id="slowerVelocityButton">
+            <tooltip>
+              <Tooltip text="Play 5% Slower" />
+            </tooltip>
+          </Button>
+          <Button text="&gt;" fx:id="playSongButton" onAction="#doPlaySong">
+            <tooltip>
+              <Tooltip text="Play" />
+            </tooltip>
+          </Button>
+          <Button text="&gt;&gt;" fx:id="fasterVelocityButton">
+            <tooltip>
+              <Tooltip text="Play 5% Faster" />
+            </tooltip>
+          </Button>
+          <Button text="&gt;&gt;|" fx:id="nextMeasureButton">
+            <tooltip>
+              <Tooltip text="Go To Next Measure" />
+            </tooltip>
+          </Button>
+          <Pane HBox.hgrow="ALWAYS" />
+        </ToolBar>
+      </bottom>
+    </BorderPane>
   </center>
   <bottom>
     <HBox>

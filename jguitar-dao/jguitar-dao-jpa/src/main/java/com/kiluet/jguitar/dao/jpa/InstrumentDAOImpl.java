@@ -26,7 +26,7 @@ public class InstrumentDAOImpl extends BaseDAOImpl<Instrument, Long> implements 
 
     @Override
     public List<Instrument> findByName(String name) throws JGuitarDAOException {
-        logger.info("ENTERING findByName(String)");
+        logger.debug("ENTERING findByName(String)");
         TypedQuery<Instrument> query = getEntityManager().createNamedQuery("Instrument.findByName", Instrument.class);
         query.setParameter("name", name);
         List<Instrument> itemList = query.getResultList();

@@ -32,7 +32,7 @@ public class SongDAOImpl extends BaseDAOImpl<Song, Long> implements SongDAO {
 
     @Override
     public List<Song> findByName(String name) throws JGuitarDAOException {
-        logger.info("ENTERING findByName(String)");
+        logger.debug("ENTERING findByName(String)");
         CriteriaBuilder critBuilder = getEntityManager().getCriteriaBuilder();
         CriteriaQuery<Song> crit = critBuilder.createQuery(Song.class);
         Root<Song> root = crit.from(Song.class);
@@ -47,7 +47,7 @@ public class SongDAOImpl extends BaseDAOImpl<Song, Long> implements SongDAO {
 
     @Override
     public List<Song> findAll() throws JGuitarDAOException {
-        logger.info("ENTERING findAll()");
+        logger.debug("ENTERING findAll()");
         TypedQuery<Song> query = getEntityManager().createNamedQuery("Song.findAll", Song.class);
         List<Song> ret = query.getResultList();
         return ret;

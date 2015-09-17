@@ -26,7 +26,7 @@ public class TrackDAOImpl extends BaseDAOImpl<Track, Long> implements TrackDAO {
 
     @Override
     public List<Track> findBySongId(Long songId) throws JGuitarDAOException {
-        logger.info("ENTERING findBySongId(Long)");
+        logger.debug("ENTERING findBySongId(Long)");
         TypedQuery<Track> query = getEntityManager().createNamedQuery("Track.findBySongId", Track.class);
         query.setParameter("songId", songId);
         List<Track> itemList = query.getResultList();

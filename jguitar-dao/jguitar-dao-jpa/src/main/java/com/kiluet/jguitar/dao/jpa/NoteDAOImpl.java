@@ -26,7 +26,7 @@ public class NoteDAOImpl extends BaseDAOImpl<Note, Long> implements NoteDAO {
 
     @Override
     public List<Note> findByBeatId(Long beatId) throws JGuitarDAOException {
-        logger.info("ENTERING findByBeatId(Long)");
+        logger.debug("ENTERING findByBeatId(Long)");
         TypedQuery<Note> query = getEntityManager().createNamedQuery("Note.findByBeatId", Note.class);
         query.setParameter("beatId", beatId);
         List<Note> itemList = query.getResultList();

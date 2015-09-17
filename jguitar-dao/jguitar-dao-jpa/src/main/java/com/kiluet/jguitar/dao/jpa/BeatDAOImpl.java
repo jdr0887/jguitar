@@ -26,7 +26,7 @@ public class BeatDAOImpl extends BaseDAOImpl<Beat, Long> implements BeatDAO {
 
     @Override
     public List<Beat> findByMeasureId(Long measureId) throws JGuitarDAOException {
-        logger.info("ENTERING findByMeasureId(Long)");
+        logger.debug("ENTERING findByMeasureId(Long)");
         TypedQuery<Beat> query = getEntityManager().createNamedQuery("Beat.findByMeasureId", Beat.class);
         query.setParameter("measureId", measureId);
         List<Beat> itemList = query.getResultList();

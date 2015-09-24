@@ -8,12 +8,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -22,17 +24,20 @@ import org.slf4j.LoggerFactory;
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.JGuitarDAOManager;
 import com.kiluet.jguitar.dao.model.KeyType;
+import com.kiluet.jguitar.dao.model.Measure;
 import com.kiluet.jguitar.dao.model.Scale;
 import com.kiluet.jguitar.dao.model.ScaleType;
 import com.kiluet.jguitar.dao.model.Song;
 import com.kiluet.jguitar.dao.model.Track;
 import com.kiluet.jguitar.desktop.components.ScalePane;
 import com.kiluet.jguitar.desktop.components.SongPane;
-import com.kiluet.jguitar.player.SongPlayer;
+import com.kiluet.jguitar.desktop.player.ScalePlayer;
+import com.kiluet.jguitar.desktop.player.SongPlayer;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -40,6 +45,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
@@ -55,9 +61,15 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(JGuitarController.class);
 
-    private SongPlayer player;
+    private static final JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
+
+    private SongPlayer songPlayer;
+
+    private ScalePlayer scalePlayer;
 
     private Song song;
+
+    private Scale scale;
 
     @FXML
     private Label dateLabel;
@@ -96,9 +108,8 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        dateLabel.setText(DateFormatUtils.ISO_DATE_FORMAT.format(new Date()));
 
-        JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
+        dateLabel.setText(DateFormatUtils.ISO_DATE_FORMAT.format(new Date()));
 
         Map<String, Menu> menuMap = new HashMap<>();
         for (KeyType keyType : KeyType.values()) {
@@ -113,7 +124,9 @@ public class JGuitarController extends BorderPane implements Initializable {
                             try {
                                 Scale scale = daoMgr.getDaoBean().getScaleDAO().findById(p.getId());
                                 getNotationBox().getChildren().clear();
-                                getNotationBox().getChildren().add(new ScalePane(JGuitarController.this, scale));
+                                ScalePane scalePane = new ScalePane(JGuitarController.this, scale);
+                                getNotationBox().getChildren().add(scalePane);
+                                scalePlayer = new ScalePlayer(JGuitarController.this, scale);
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
@@ -140,7 +153,9 @@ public class JGuitarController extends BorderPane implements Initializable {
                             try {
                                 Scale scale = daoMgr.getDaoBean().getScaleDAO().findById(p.getId());
                                 getNotationBox().getChildren().clear();
-                                getNotationBox().getChildren().add(new ScalePane(JGuitarController.this, scale));
+                                ScalePane scalePane = new ScalePane(JGuitarController.this, scale);
+                                getNotationBox().getChildren().add(scalePane);
+                                scalePlayer = new ScalePlayer(JGuitarController.this, scale);
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
@@ -156,14 +171,14 @@ public class JGuitarController extends BorderPane implements Initializable {
         scalesMenu.getItems().add(pentatonicMenu);
 
         try {
-            this.song = daoMgr.getDaoBean().getSongDAO().findByName("Template").get(0);
-            getNotationBox().getChildren().clear();
-            SongPane songPane = new SongPane(JGuitarController.this, this.song);
-            getNotationBox().getChildren().add(songPane);
-            this.player = new SongPlayer(songPane);
+            this.song = JGuitarDAOManager.getInstance().getDaoBean().getSongDAO().findByName("Template").get(0);
         } catch (JGuitarDAOException e) {
             e.printStackTrace();
         }
+        getNotationBox().getChildren().clear();
+        SongPane songPane = new SongPane(JGuitarController.this, this.song);
+        getNotationBox().getChildren().add(songPane);
+        this.songPlayer = new SongPlayer(JGuitarController.this, song);
 
     }
 
@@ -178,24 +193,102 @@ public class JGuitarController extends BorderPane implements Initializable {
     }
 
     @FXML
+    private void addMeasure(final ActionEvent event) {
+
+    }
+
+    @FXML
+    private void removeMeasure(final ActionEvent event) {
+
+    }
+
+    @FXML
+    private void addRepeat(final ActionEvent event) {
+        for (Track track : this.song.getTracks()) {
+            for (Measure measure : track.getMeasures()) {
+                if (measure.getNumber().equals(this.getSongPlayer().getMeasureIndex())) {
+                    try {
+                        if (measure.getOpenRepeat()) {
+                            measure.setOpenRepeat(Boolean.FALSE);
+                        } else {
+                            measure.setOpenRepeat(Boolean.TRUE);
+                        }
+                        daoMgr.getDaoBean().getMeasureDAO().save(measure);
+                    } catch (JGuitarDAOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    @FXML
+    private void removeRepeat(final ActionEvent event) {
+        TextInputDialog input = new TextInputDialog();
+        input.setGraphic(null);
+        input.setHeaderText(null);
+        input.setTitle("Remove Repeat");
+        input.setContentText("Measure Index");
+        Optional<String> value = input.showAndWait();
+        value.ifPresent(name -> System.out.println(value.get()));
+    }
+
+    @FXML
+    private void addTrack(final ActionEvent event) {
+
+    }
+
+    @FXML
+    private void removeTrack(final ActionEvent event) {
+
+    }
+
+    @FXML
     private void doUndo(final ActionEvent event) {
     }
 
     @FXML
     private void doPlaySong(final ActionEvent event) {
 
-        if (playSongButton.getText().equals(">")) {
-            playSongButton.setText("||");
-            if (player.isPaused()) {
-                // start playing
-                player.play();
-            } 
-        } else {
-            playSongButton.setText(">");
-            if (player.isPlaying()) {
-                // stop playing
-                player.pause();
-            } 
+        if (CollectionUtils.isNotEmpty(getNotationBox().getChildren())) {
+
+            if (getNotationBox().getChildren().get(0) instanceof SongPane) {
+
+                if (playSongButton.getText().equals(">")) {
+                    playSongButton.setText("||");
+                    if (songPlayer.isPaused()) {
+                        // start playing
+                        songPlayer.play();
+                    }
+                } else {
+                    playSongButton.setText(">");
+                    if (songPlayer.isPlaying()) {
+                        // stop playing
+                        songPlayer.pause();
+                    }
+                }
+
+            }
+
+            if (getNotationBox().getChildren().get(0) instanceof ScalePane) {
+
+                if (playSongButton.getText().equals(">")) {
+                    playSongButton.setText("||");
+                    if (scalePlayer.isPaused()) {
+                        // start playing
+                        scalePlayer.play();
+                    }
+                } else {
+                    playSongButton.setText(">");
+                    if (scalePlayer.isPlaying()) {
+                        // stop playing
+                        scalePlayer.pause();
+                    }
+                }
+
+            }
+
         }
 
     }
@@ -294,12 +387,28 @@ public class JGuitarController extends BorderPane implements Initializable {
         this.app = app;
     }
 
-    public SongPlayer getPlayer() {
-        return player;
+    public SongPlayer getSongPlayer() {
+        return songPlayer;
     }
 
-    public void setPlayer(SongPlayer player) {
-        this.player = player;
+    public void setSongPlayer(SongPlayer songPlayer) {
+        this.songPlayer = songPlayer;
+    }
+
+    public ScalePlayer getScalePlayer() {
+        return scalePlayer;
+    }
+
+    public void setScalePlayer(ScalePlayer scalePlayer) {
+        this.scalePlayer = scalePlayer;
+    }
+
+    public Scale getScale() {
+        return scale;
+    }
+
+    public void setScale(Scale scale) {
+        this.scale = scale;
     }
 
     public Song getSong() {

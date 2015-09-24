@@ -45,7 +45,6 @@ public class JGuitarDAOManager {
         if (!jguitarDatabaseDir.exists()) {
             properties.put("javax.persistence.jdbc.url",
                     String.format("jdbc:derby:db;create=true;user=%s;password=jguitar", userName));
-            properties.put("openjpa.jdbc.SynchronizeMappings", "buildSchema(ForeignKeys=true)");
         } else {
             properties.put("javax.persistence.jdbc.url",
                     String.format("jdbc:derby:db;user=%s;password=jguitar", userName));

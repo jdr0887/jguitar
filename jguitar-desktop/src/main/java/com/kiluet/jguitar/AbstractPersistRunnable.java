@@ -6,17 +6,20 @@ import com.kiluet.jguitar.dao.model.Beat;
 import com.kiluet.jguitar.dao.model.DurationType;
 import com.kiluet.jguitar.dao.model.Instrument;
 import com.kiluet.jguitar.dao.model.Measure;
+import com.kiluet.jguitar.dao.model.MeterType;
 import com.kiluet.jguitar.dao.model.Note;
 import com.kiluet.jguitar.dao.model.Song;
 import com.kiluet.jguitar.dao.model.Track;
 
 public abstract class AbstractPersistRunnable implements Runnable {
 
-    protected final JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
+    protected static final JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
 
     public AbstractPersistRunnable() {
         super();
     }
+
+    public abstract String getName();
 
     protected Track createTrack(Song song, Integer number, Instrument instrument) throws JGuitarDAOException {
         Track track = new Track();
@@ -38,6 +41,8 @@ public abstract class AbstractPersistRunnable implements Runnable {
 
     protected Measure createMeasure(Track track, Integer number) throws JGuitarDAOException {
         Measure measure = new Measure();
+        measure.setMeterType(MeterType.COMMON);
+        measure.setTempo(120);
         measure.setNumber(number);
         measure.setTrack(track);
         measure.setId(daoMgr.getDaoBean().getMeasureDAO().save(measure));

@@ -1,28 +1,23 @@
 package com.kiluet.jguitar.desktop;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kiluet.jguitar.PersistHeptatonicScalesRunnable;
-import com.kiluet.jguitar.PersistInstrumentsRunnable;
-import com.kiluet.jguitar.PersistPentatonicScalesRunnable;
-import com.kiluet.jguitar.PersistTemplateRunnable;
 import com.kiluet.jguitar.config.Config;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class Main extends Application {
 
-    private final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private final Config config = Config.getInstance();
 
@@ -40,31 +35,26 @@ public class Main extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        ExecutorService es = Executors.newFixedThreadPool(4);
-        es.submit(new PersistInstrumentsRunnable());
-        es.submit(new PersistTemplateRunnable());
-        es.submit(new PersistHeptatonicScalesRunnable());
-        es.submit(new PersistPentatonicScalesRunnable());
-        es.shutdown();
-        es.awaitTermination(10, TimeUnit.SECONDS);
     }
 
     @Override
     public void start(final Stage stage) throws Exception {
         logger.debug("ENTERING start(Stage)");
+
         this.stage = stage;
         this.stage.setTitle("JGuitar");
 
         try {
 
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(Main.class.getResource("JGuitar.fxml"));
-            BorderPane rootPane = loader.load();
+            loader.setLocation(Main.class.getResource("Splash.fxml"));
+            Pane rootPane = loader.load();
 
-            JGuitarController controller = loader.getController();
+            SplashController controller = loader.getController();
             controller.setApp(this);
 
             Scene scene = new Scene(rootPane);
+            this.stage.initStyle(StageStyle.UNDECORATED);
             this.stage.setScene(scene);
             this.stage.sizeToScene();
 
@@ -82,13 +72,14 @@ public class Main extends Application {
             e.printStackTrace();
             System.exit(-1);
         }
+
     }
 
     public Stage getStage() {
         return stage;
     }
 
-    public void setPrimaryStage(Stage stage) {
+    public void setStage(Stage stage) {
         this.stage = stage;
     }
 

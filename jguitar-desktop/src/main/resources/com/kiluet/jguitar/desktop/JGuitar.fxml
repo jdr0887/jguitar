@@ -5,7 +5,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.collections.*?>
-<?import javafx.scene.control.Tab?>
 
 <BorderPane prefHeight="600" prefWidth="1200" stylesheets="@JGuitar.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="com.kiluet.jguitar.desktop.JGuitarController">
@@ -53,8 +52,14 @@
     <BorderPane>
       <top>
         <ToolBar fx:id="controlsToolBar">
+          <Button text="&gt;" fx:id="playSongButton" onAction="#doPlaySong">
+            <tooltip>
+              <Tooltip text="Play" />
+            </tooltip>
+          </Button>
+          <Separator />
           <Label text="Speed:" />
-          <ComboBox layoutX="15.0" layoutY="33.0" prefWidth="90.0">
+          <ComboBox prefWidth="75.0">
             <items>
               <FXCollections fx:factory="observableArrayList">
                 <String fx:value="100" />
@@ -65,6 +70,9 @@
                 <String fx:value="50" />
               </FXCollections>
             </items>
+            <value>
+              <String fx:value="100" />
+            </value>
           </ComboBox>
           <Separator />
           <ToggleButton text="1" fx:id="wholeDurationButton" toggleGroup="$beatDurationTypeGroup" />
@@ -75,14 +83,22 @@
           <ToggleButton text="1/32" fx:id="thritySecondDurationButton" toggleGroup="$beatDurationTypeGroup" />
           <ToggleButton text="1/64" fx:id="sixtyFouthDurationButton" toggleGroup="$beatDurationTypeGroup" />
           <Separator />
-          <Button text="||:" />
-          <Button text=":||" />
+          <Button text="||:" onAction="#addRepeat" />
+          <Button text=":||" onAction="#removeRepeat" />
           <Separator />
-          <Button text="+ Track" />
-          <Button text="- Track" />
+          <MenuButton text="Tracks">
+            <items>
+              <MenuItem onAction="#addTrack" text="Add" />
+              <MenuItem onAction="#removeTrack" text="Remove" />
+            </items>
+          </MenuButton>
           <Separator />
-          <Button text="+ Measure" />
-          <Button text="- Measure" />
+          <MenuButton text="Measures">
+            <items>
+              <MenuItem onAction="#addMeasure" text="Add" />
+              <MenuItem onAction="#removeMeasure" text="Remove" />
+            </items>
+          </MenuButton>
         </ToolBar>
       </top>
       <center>
@@ -91,35 +107,6 @@
         </ScrollPane>
       </center>
       <bottom>
-        <ToolBar>
-          <Pane HBox.hgrow="ALWAYS" />
-          <Button text="|&lt;&lt;" fx:id="previousMeasureButton">
-            <tooltip>
-              <Tooltip text="Go To Previous Measure" />
-            </tooltip>
-          </Button>
-          <Button text="&lt;&lt;" fx:id="slowerVelocityButton">
-            <tooltip>
-              <Tooltip text="Play 5% Slower" />
-            </tooltip>
-          </Button>
-          <Button text="&gt;" fx:id="playSongButton" onAction="#doPlaySong">
-            <tooltip>
-              <Tooltip text="Play" />
-            </tooltip>
-          </Button>
-          <Button text="&gt;&gt;" fx:id="fasterVelocityButton">
-            <tooltip>
-              <Tooltip text="Play 5% Faster" />
-            </tooltip>
-          </Button>
-          <Button text="&gt;&gt;|" fx:id="nextMeasureButton">
-            <tooltip>
-              <Tooltip text="Go To Next Measure" />
-            </tooltip>
-          </Button>
-          <Pane HBox.hgrow="ALWAYS" />
-        </ToolBar>
       </bottom>
     </BorderPane>
   </center>

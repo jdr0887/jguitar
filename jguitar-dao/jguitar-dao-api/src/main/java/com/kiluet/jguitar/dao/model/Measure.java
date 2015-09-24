@@ -29,7 +29,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "measure")
 @Entity
 @Table(schema = "jguitar", name = "measure")
-@NamedQueries({ @NamedQuery(name = "Measure.findByTrackId", query = "SELECT a FROM Measure a where a.track.id = :trackId order by a.number") })
+@NamedQueries({
+        @NamedQuery(name = "Measure.findByTrackId", query = "SELECT a FROM Measure a where a.track.id = :trackId order by a.number") })
 public class Measure extends PersistantEntity {
 
     private static final long serialVersionUID = -8979175208508024995L;
@@ -50,7 +51,7 @@ public class Measure extends PersistantEntity {
     private Integer tempo;
 
     @Column(name = "open_repeat")
-    private Boolean openRepeat;
+    private Boolean openRepeat = Boolean.FALSE;
 
     @Column(name = "alternate_repeat")
     private Integer alternativeRepeat;
@@ -160,9 +161,9 @@ public class Measure extends PersistantEntity {
 
     @Override
     public String toString() {
-        return String
-                .format("Measure [id=%s, number=%s, start=%s, meterType=%s, tempo=%s, openRepeat=%s, alternativeRepeat=%s, closeRepeat=%s, tripletFeel=%s]",
-                        id, number, start, meterType, tempo, openRepeat, alternativeRepeat, closeRepeat, tripletFeel);
+        return String.format(
+                "Measure [id=%s, number=%s, start=%s, meterType=%s, tempo=%s, openRepeat=%s, alternativeRepeat=%s, closeRepeat=%s, tripletFeel=%s]",
+                id, number, start, meterType, tempo, openRepeat, alternativeRepeat, closeRepeat, tripletFeel);
     }
 
     @Override

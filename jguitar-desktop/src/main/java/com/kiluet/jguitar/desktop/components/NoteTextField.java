@@ -28,7 +28,6 @@ public class NoteTextField extends TextField {
     public void colorRed() {
         setStyle(
                 "-fx-text-fill: red; -fx-alignment: center; -fx-background-color: transparent; -fx-background-insets: 0; -fx-background-radius: 0; -fx-padding: 0; -fx-pref-column-count: 1; -fx-font-size: 12;");
-
     }
 
     public void colorBlack() {

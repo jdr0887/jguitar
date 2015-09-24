@@ -34,4 +34,12 @@ public class ScalePane extends GridPane {
         GridPane.setHalignment(trackPane, HPos.LEFT);
     }
 
+    public Scale getScale() {
+        return scale;
+    }
+
+    public void setScale(Scale scale) {
+        this.scale = scale;
+    }
+
 }

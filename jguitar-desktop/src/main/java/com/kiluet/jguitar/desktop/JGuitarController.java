@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -29,6 +31,9 @@ import com.kiluet.jguitar.dao.model.Scale;
 import com.kiluet.jguitar.dao.model.ScaleType;
 import com.kiluet.jguitar.dao.model.Song;
 import com.kiluet.jguitar.dao.model.Track;
+import com.kiluet.jguitar.desktop.components.MeasureCloseSeparatorPane;
+import com.kiluet.jguitar.desktop.components.MeasureHeaderPane;
+import com.kiluet.jguitar.desktop.components.MeasureOpenSeparatorPane;
 import com.kiluet.jguitar.desktop.components.ScalePane;
 import com.kiluet.jguitar.desktop.components.SongPane;
 import com.kiluet.jguitar.desktop.player.ScalePlayer;
@@ -69,7 +74,11 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     private Song song;
 
+    private SongPane songPane;
+
     private Scale scale;
+
+    private ScalePane scalePane;
 
     @FXML
     private Label dateLabel;
@@ -166,6 +175,7 @@ public class JGuitarController extends BorderPane implements Initializable {
                 e.printStackTrace();
             }
         }
+
         Menu pentatonicMenu = new Menu(StringUtils.capitalize(ScaleType.PENTATONIC.name().toLowerCase()));
         menuMap.values().forEach(p -> pentatonicMenu.getItems().add(p));
         scalesMenu.getItems().add(pentatonicMenu);
@@ -175,8 +185,9 @@ public class JGuitarController extends BorderPane implements Initializable {
         } catch (JGuitarDAOException e) {
             e.printStackTrace();
         }
+
         getNotationBox().getChildren().clear();
-        SongPane songPane = new SongPane(JGuitarController.this, this.song);
+        this.songPane = new SongPane(JGuitarController.this, this.song);
         getNotationBox().getChildren().add(songPane);
         this.songPlayer = new SongPlayer(JGuitarController.this, song);
 
@@ -203,35 +214,150 @@ public class JGuitarController extends BorderPane implements Initializable {
     }
 
     @FXML
-    private void addRepeat(final ActionEvent event) {
+    private void toggleOpenRepeat(final ActionEvent event) {
         for (Track track : this.song.getTracks()) {
-            for (Measure measure : track.getMeasures()) {
-                if (measure.getNumber().equals(this.getSongPlayer().getMeasureIndex())) {
-                    try {
-                        if (measure.getOpenRepeat()) {
-                            measure.setOpenRepeat(Boolean.FALSE);
-                        } else {
-                            measure.setOpenRepeat(Boolean.TRUE);
-                        }
-                        daoMgr.getDaoBean().getMeasureDAO().save(measure);
-                    } catch (JGuitarDAOException e) {
-                        e.printStackTrace();
-                    }
+            Measure measure = null;
+            for (Measure m : track.getMeasures()) {
+                if (m.getNumber().equals(this.getSongPlayer().getMeasureIndex())) {
+                    measure = m;
                     break;
                 }
             }
+
+            try {
+                if (measure.getOpenRepeat()) {
+                    measure.setOpenRepeat(Boolean.FALSE);
+                } else {
+                    measure.setOpenRepeat(Boolean.TRUE);
+                }
+                daoMgr.getDaoBean().getMeasureDAO().save(measure);
+            } catch (JGuitarDAOException e) {
+                e.printStackTrace();
+            }
+
+            Node trackPaneNode = this.songPane.lookup(String.format("#TrackPane_%d", measure.getTrack().getId()));
+            Node measurePaneNode = trackPaneNode.lookup(String.format("#MeasurePane_%d", measure.getId()));
+
+            Node measureSeparatorNode = measurePaneNode
+                    .lookup(String.format("#MeasureOpenSeparatorPane_%d", measure.getId()));
+            if (measureSeparatorNode != null && measureSeparatorNode instanceof MeasureOpenSeparatorPane) {
+                MeasureOpenSeparatorPane measureSeparatorPane = (MeasureOpenSeparatorPane) measureSeparatorNode;
+                measureSeparatorPane.getChildren().clear();
+                measureSeparatorPane.init();
+                measureSeparatorPane.requestLayout();
+            }
         }
+
     }
 
     @FXML
-    private void removeRepeat(final ActionEvent event) {
+    private void toggleCloseRepeat(final ActionEvent event) {
+
         TextInputDialog input = new TextInputDialog();
         input.setGraphic(null);
         input.setHeaderText(null);
         input.setTitle("Remove Repeat");
-        input.setContentText("Measure Index");
-        Optional<String> value = input.showAndWait();
-        value.ifPresent(name -> System.out.println(value.get()));
+        input.setContentText("Repetitions");
+
+        List<Measure> measuresAccrossTracks = new ArrayList<Measure>();
+        for (Track track : this.song.getTracks()) {
+            for (Measure m : track.getMeasures()) {
+                if (m.getNumber().equals(this.getSongPlayer().getMeasureIndex())) {
+                    measuresAccrossTracks.add(m);
+                    break;
+                }
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(measuresAccrossTracks)) {
+
+            if (measuresAccrossTracks.get(0).getCloseRepeat() == null) {
+                Optional<String> value = input.showAndWait();
+                value.ifPresent(b -> {
+
+                    if (NumberUtils.isNumber(b)) {
+
+                        measuresAccrossTracks.forEach(a -> {
+                            try {
+                                a.setCloseRepeat(Integer.valueOf(b));
+                                daoMgr.getDaoBean().getMeasureDAO().save(a);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            Node trackPaneNode = this.songPane
+                                    .lookup(String.format("#TrackPane_%d", a.getTrack().getId()));
+                            Node measurePaneNode = trackPaneNode.lookup(String.format("#MeasurePane_%d", a.getId()));
+
+                            Node measureOpenSeparatorNode = measurePaneNode
+                                    .lookup(String.format("#MeasureOpenSeparatorPane_%d", a.getId()));
+                            if (measureOpenSeparatorNode != null
+                                    && measureOpenSeparatorNode instanceof MeasureOpenSeparatorPane) {
+                                MeasureOpenSeparatorPane measureSeparatorPane = (MeasureOpenSeparatorPane) measureOpenSeparatorNode;
+                                measureSeparatorPane.getChildren().clear();
+                                measureSeparatorPane.init();
+                                measureSeparatorPane.requestLayout();
+                            }
+
+                            Node measureCloseSeparatorNode = measurePaneNode
+                                    .lookup(String.format("#MeasureCloseSeparatorPane_%d", a.getId()));
+                            if (measureCloseSeparatorNode != null
+                                    && measureCloseSeparatorNode instanceof MeasureCloseSeparatorPane) {
+                                MeasureCloseSeparatorPane measureSeparatorPane = (MeasureCloseSeparatorPane) measureCloseSeparatorNode;
+                                measureSeparatorPane.getChildren().clear();
+                                measureSeparatorPane.init();
+                                measureSeparatorPane.requestLayout();
+                            }
+
+                            Node measureHeaderNode = trackPaneNode
+                                    .lookup(String.format("#MeasureHeaderPane_%d", a.getId()));
+                            if (measureHeaderNode != null && measureHeaderNode instanceof MeasureHeaderPane) {
+                                MeasureHeaderPane measureHeaderPane = (MeasureHeaderPane) measureHeaderNode;
+                                measureHeaderPane.getChildren().clear();
+                                measureHeaderPane.init();
+                                measureHeaderPane.requestLayout();
+                            }
+
+                        });
+
+                    }
+                });
+
+            } else {
+
+                measuresAccrossTracks.forEach(a -> {
+                    try {
+                        a.setCloseRepeat(null);
+                        daoMgr.getDaoBean().getMeasureDAO().save(a);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    Node trackPaneNode = this.songPane.lookup(String.format("#TrackPane_%d", a.getTrack().getId()));
+                    Node measurePaneNode = trackPaneNode.lookup(String.format("#MeasurePane_%d", a.getId()));
+
+                    Node measureHeaderNode = trackPaneNode.lookup(String.format("#MeasureHeaderPane_%d", a.getId()));
+                    if (measureHeaderNode != null && measureHeaderNode instanceof MeasureHeaderPane) {
+                        MeasureHeaderPane measureHeaderPane = (MeasureHeaderPane) measureHeaderNode;
+                        measureHeaderPane.getChildren().clear();
+                        measureHeaderPane.init();
+                        measureHeaderPane.requestLayout();
+                    }
+
+                    Node measureSeparatorNode = measurePaneNode
+                            .lookup(String.format("#MeasureCloseSeparatorPane_%d", a.getId()));
+                    if (measureSeparatorNode != null && measureSeparatorNode instanceof MeasureCloseSeparatorPane) {
+                        MeasureCloseSeparatorPane measureSeparatorPane = (MeasureCloseSeparatorPane) measureSeparatorNode;
+                        measureSeparatorPane.getChildren().clear();
+                        measureSeparatorPane.init();
+                        measureSeparatorPane.requestLayout();
+                    }
+
+                });
+            }
+
+        }
+
     }
 
     @FXML

@@ -83,8 +83,8 @@
           <ToggleButton text="1/32" fx:id="thritySecondDurationButton" toggleGroup="$beatDurationTypeGroup" />
           <ToggleButton text="1/64" fx:id="sixtyFouthDurationButton" toggleGroup="$beatDurationTypeGroup" />
           <Separator />
-          <Button text="||:" onAction="#addRepeat" />
-          <Button text=":||" onAction="#removeRepeat" />
+          <Button text="||:" onAction="#toggleOpenRepeat" />
+          <Button text=":||" onAction="#toggleCloseRepeat" />
           <Separator />
           <MenuButton text="Tracks">
             <items>

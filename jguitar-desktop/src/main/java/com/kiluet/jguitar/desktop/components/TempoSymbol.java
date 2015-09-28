@@ -2,7 +2,6 @@ package com.kiluet.jguitar.desktop.components;
 
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
@@ -21,7 +20,7 @@ public class TempoSymbol extends GridPane {
         init();
     }
 
-    private void init() {
+    public void init() {
 
         Group group = new Group();
         Line line = new Line(1.35, 9, 1.35, -10);

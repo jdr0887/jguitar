@@ -10,7 +10,7 @@ public class EighthNoteSymbol extends Group {
         init();
     }
 
-    private void init() {
+    public void init() {
         Line line = new Line(0, 0, 0, 15);
         line.setStrokeWidth(.5);
         getChildren().add(line);

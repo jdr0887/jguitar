@@ -10,7 +10,7 @@ public class QuarterNoteSymbol extends Group {
         init();
     }
 
-    private void init() {
+    public void init() {
         Line line = new Line(0, 0, 0, 15);
         line.setStrokeWidth(1);
         getChildren().add(line);

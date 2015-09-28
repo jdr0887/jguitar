@@ -1,56 +1,101 @@
 package com.kiluet.jguitar.desktop.components;
 
-import com.kiluet.jguitar.dao.model.Measure;
+import java.util.List;
 
+import com.kiluet.jguitar.dao.model.Beat;
+import com.kiluet.jguitar.dao.model.InstrumentString;
+import com.kiluet.jguitar.dao.model.Measure;
+import com.kiluet.jguitar.desktop.JGuitarController;
+
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 
 public class MeasureFooterPane extends GridPane {
 
     private Measure measure;
 
-    public MeasureFooterPane(Measure measure) {
+    private JGuitarController jguitarController;
+
+    public MeasureFooterPane(JGuitarController jguitarController, Measure measure) {
         super();
         this.measure = measure;
+        this.jguitarController = jguitarController;
         init();
     }
 
-    private void init() {
+    public void init() {
 
-        int stringCount = measure.getTrack().getInstrument().getStrings().size();
+        List<InstrumentString> instrumentStrings = measure.getTrack().getInstrument().getStrings();
 
-        for (int i = 0; i < stringCount; i++) {
+        for (Beat beat : measure.getBeats()) {
 
-            StackPane stackPane = new StackPane();
-            // -fx-border-color: red;
-            stackPane.setMinHeight(18);
-            stackPane.setMaxHeight(18);
-            stackPane.setStyle("-fx-padding: 0;");
-
-            Line line = new Line(0, i + 1 * 10, 15, i + 1 * 10);
-            line.setStroke(Color.LIGHTGRAY);
-
-            stackPane.getChildren().addAll(line);
-
-            add(stackPane, 3, i + 1);
+            switch (beat.getDuration()) {
+                case WHOLE:
+                    jguitarController.getWholeDurationButton().setSelected(true);
+                    break;
+                case HALF:
+                    jguitarController.getHalfDurationButton().setSelected(true);
+                    break;
+                case QUARTER:
+                    jguitarController.getQuarterDurationButton().setSelected(true);
+                    QuarterNoteSymbol quarterNoteSymbol = new QuarterNoteSymbol();
+                    add(quarterNoteSymbol, beat.getNumber(), 0);
+                    GridPane.setMargin(quarterNoteSymbol, new Insets(10, 0, 0, 0));
+                    if (measure.getNumber() == 1) {
+                        GridPane.setMargin(quarterNoteSymbol, new Insets(10, 0, 0, 40));
+                    } 
+                    GridPane.setHalignment(quarterNoteSymbol, HPos.CENTER);
+                    break;
+                case EIGHTH:
+                    jguitarController.getEighthDurationButton().setSelected(true);
+                    EighthNoteSymbol eighthNoteSymbol = new EighthNoteSymbol();
+                    add(eighthNoteSymbol, beat.getNumber(), 0);
+                    GridPane.setMargin(eighthNoteSymbol, new Insets(10, 0, 0, 0));
+                    if (measure.getNumber() == 1) {
+                        GridPane.setMargin(eighthNoteSymbol, new Insets(10, 0, 0, 40));
+                    } 
+                    GridPane.setHalignment(eighthNoteSymbol, HPos.CENTER);
+                    break;
+                case SIXTEENTH:
+                    jguitarController.getSixteenthDurationButton().setSelected(true);
+                    SixteenthNoteSymbol sixteenthNoteSymbol = new SixteenthNoteSymbol();
+                    add(sixteenthNoteSymbol, beat.getNumber(), 0);
+                    if (measure.getNumber() == 1) {
+                        GridPane.setMargin(sixteenthNoteSymbol, new Insets(10, 0, 0, 40));
+                    } else {
+                        GridPane.setMargin(sixteenthNoteSymbol, new Insets(10, 0, 0, 0));
+                    }
+                    GridPane.setHalignment(sixteenthNoteSymbol, HPos.CENTER);
+                    break;
+                case THIRTY_SECOND:
+                    jguitarController.getThritySecondDurationButton().setSelected(true);
+                    ThirtySecondNoteSymbol thirtySecondNoteSymbol = new ThirtySecondNoteSymbol();
+                    add(thirtySecondNoteSymbol, beat.getNumber(), 0);
+                    if (measure.getNumber() == 1) {
+                        GridPane.setMargin(thirtySecondNoteSymbol, new Insets(10, 0, 0, 40));
+                    } else {
+                        GridPane.setMargin(thirtySecondNoteSymbol, new Insets(10, 0, 0, 0));
+                    }
+                    GridPane.setHalignment(thirtySecondNoteSymbol, HPos.CENTER);
+                    break;
+                case SIXTY_FOURTH:
+                    jguitarController.getSixtyFouthDurationButton().setSelected(true);
+                    SixtyFourthNoteSymbol sixtyFourthNoteSymbol = new SixtyFourthNoteSymbol();
+                    add(sixtyFourthNoteSymbol, beat.getNumber(), 0);
+                    if (measure.getNumber() == 1) {
+                        GridPane.setMargin(sixtyFourthNoteSymbol, new Insets(10, 0, 0, 40));
+                    } else {
+                        GridPane.setMargin(sixtyFourthNoteSymbol, new Insets(10, 0, 0, 0));
+                    }
+                    GridPane.setHalignment(sixtyFourthNoteSymbol, HPos.CENTER);
+                    break;
+                default:
+                    jguitarController.getWholeDurationButton().setSelected(true);
+                    break;
+            }
 
         }
-
-        Line line = new Line(0, 0, 0, (stringCount - 1) * 18);
-        line.setStrokeWidth(1);
-        add(line, 1, 1, 1, stringCount);
-        GridPane.setMargin(line, new Insets(0, 1, 0, 0));
-
-        line = new Line(0, 0, 0, (stringCount - 1) * 18 - 3);
-        line.setStrokeWidth(4);
-        add(line, 2, 1, 1, stringCount);
 
     }
 

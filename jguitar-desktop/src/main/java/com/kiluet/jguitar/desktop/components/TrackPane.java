@@ -12,6 +12,7 @@ import com.kiluet.jguitar.dao.model.Track;
 import com.kiluet.jguitar.desktop.JGuitarController;
 
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.scene.layout.GridPane;
 
 public class TrackPane extends GridPane {
@@ -26,34 +27,47 @@ public class TrackPane extends GridPane {
         super();
         this.jguitarController = jguitarController;
         this.track = track;
+        setId(String.format("TrackPane_%d", track.getId()));
         init();
     }
 
     public void init() {
-        setId(String.format("TrackPane_%d", track.getId()));
 
-        // setStyle("-fx-border-color: red;");
+        // setStyle("-fx-border-color: red; -fx-padding: 14 0 14 0;");
+        setStyle("-fx-padding: 14 0 14 0;");
 
         Measure previousMeasure = null;
-        for (Measure measure : track.getMeasures()) {
-
-            if (measure.getNumber() == 1 && track.getNumber() == 1) {
-                TempoSymbol tempoSymbol = new TempoSymbol(measure.getTempo());
-                add(tempoSymbol, 1, 0);
-                GridPane.setHalignment(tempoSymbol, HPos.LEFT);
-            } else if (previousMeasure != null && !previousMeasure.getTempo().equals(measure.getTempo())) {
-                TempoSymbol tempoSymbol = new TempoSymbol(measure.getTempo());
-                add(tempoSymbol, 1, 0);
-                GridPane.setHalignment(tempoSymbol, HPos.LEFT);
-            }
-
-            logger.info(measure.toString());
-            MeasurePane measurePane = new MeasurePane(jguitarController, measure);
-            add(measurePane, measure.getNumber(), 1);
-            previousMeasure = measure;
-        }
 
         List<InstrumentString> instrumentStrings = track.getInstrument().getStrings();
+
+        for (Measure measure : track.getMeasures()) {
+
+            logger.info(measure.toString());
+
+            if (measure.getNumber() == 1 && measure.getTrack().getNumber() == 1) {
+                TempoSymbol tempoSymbol = new TempoSymbol(measure.getTempo());
+                add(tempoSymbol, 0, 0, track.getMeasures().size(), 1);
+                GridPane.setHalignment(tempoSymbol, HPos.LEFT);
+                GridPane.setMargin(tempoSymbol, new Insets(0, 0, 5, 0));
+            } else if (previousMeasure != null && !previousMeasure.getTempo().equals(measure.getTempo())) {
+                TempoSymbol tempoSymbol = new TempoSymbol(measure.getTempo());
+                add(tempoSymbol, 0, 0, track.getMeasures().size(), 1);
+                GridPane.setHalignment(tempoSymbol, HPos.LEFT);
+                GridPane.setMargin(tempoSymbol, new Insets(0, 0, 5, 0));
+            }
+
+            MeasureHeaderPane measureHeaderPane = new MeasureHeaderPane(measure);
+            add(measureHeaderPane, measure.getNumber(), 1);
+
+            MeasurePane measurePane = new MeasurePane(jguitarController, measure);
+            add(measurePane, measure.getNumber(), 2);
+
+            // MeasureFooterPane measureFooterPane = new MeasureFooterPane(jguitarController, measure);
+            // add(measureFooterPane, measure.getNumber(), 3);
+
+            previousMeasure = measure;
+
+        }
 
         String noteTextFieldLookupFormat = "#NoteTextField_%d_%d_%d_%d";
         // navigation

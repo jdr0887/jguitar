@@ -60,7 +60,7 @@ public class MeasurePane extends GridPane {
                 noteTextField.setId(String.format("NoteTextField_%d_%d_%d_%d", measure.getTrack().getId(),
                         measure.getNumber(), beat.getNumber(), instrumentString.getString()));
                 noteTextField.focusedProperty().addListener(e -> {
-                    jguitarController.getSongPlayer().setMeasureIndex(measure.getNumber());
+                    jguitarController.setMeasureIndex(measure.getNumber());
                     switch (beat.getDuration()) {
                         case WHOLE:
                             jguitarController.getWholeDurationButton().setSelected(true);

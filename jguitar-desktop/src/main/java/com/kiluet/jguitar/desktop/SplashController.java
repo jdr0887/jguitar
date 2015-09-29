@@ -64,11 +64,11 @@ public class SplashController extends Pane implements Initializable {
                 es.shutdown();
                 es.awaitTermination(10, TimeUnit.SECONDS);
                 updateProgress(1, 1);
-
+                
                 return null;
             }
         };
-
+        
         progressBar.progressProperty().bind(task.progressProperty());
 
         task.stateProperty().addListener((observableValue, oldState, newState) -> {

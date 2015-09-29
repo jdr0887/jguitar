@@ -52,13 +52,13 @@ public class TemplatePersistRunnable extends AbstractPersistRunnable {
 
         try {
 
-            List<Song> persistedSongs = daoMgr.getDaoBean().getSongDAO().findByName("Template");
+            List<Song> persistedSongs = daoMgr.getDaoBean().getSongDAO().findByTitle("Template");
             if (CollectionUtils.isNotEmpty(persistedSongs)) {
                 return persistedSongs.get(0);
             }
 
             song = new Song();
-            song.setName("Template");
+            song.setTitle("Template");
             song.setComments("Template");
             song.setId(daoMgr.getDaoBean().getSongDAO().save(song));
 

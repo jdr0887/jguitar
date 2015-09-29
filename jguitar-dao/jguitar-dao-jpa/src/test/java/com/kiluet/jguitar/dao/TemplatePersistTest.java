@@ -24,7 +24,7 @@ public class TemplatePersistTest {
 
             Song song = new Song();
             song.setComments("Template");
-            song.setName("Template");
+            song.setTitle("Template");
             song.setId(daoMgr.getDaoBean().getSongDAO().save(song));
 
             List<Instrument> instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Guitar");
@@ -100,7 +100,7 @@ public class TemplatePersistTest {
 
             beat = createBeat(measure, DurationType.HALF, 2);
             createNote(beat, 4, 3);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }

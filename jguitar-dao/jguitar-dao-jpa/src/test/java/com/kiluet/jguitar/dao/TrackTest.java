@@ -21,7 +21,7 @@ public class TrackTest {
 
         JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
         try {
-            Song song = daoMgr.getDaoBean().getSongDAO().findByName("Template").get(0);
+            Song song = daoMgr.getDaoBean().getSongDAO().findByTitle("Template").get(0);
 
             Map<String, List<Beat>> beatMap = new HashMap<String, List<Beat>>();
 
@@ -55,7 +55,7 @@ public class TrackTest {
 
         JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
         try {
-            Song song = daoMgr.getDaoBean().getSongDAO().findByName("Template").get(0);
+            Song song = daoMgr.getDaoBean().getSongDAO().findByTitle("Template").get(0);
 
             for (Measure measure : song.getTracks().get(0).getMeasures()) {
                 List<Beat> beats = daoMgr.getDaoBean().getBeatDAO().findBySongIdAndMeasureNumber(song.getId(),

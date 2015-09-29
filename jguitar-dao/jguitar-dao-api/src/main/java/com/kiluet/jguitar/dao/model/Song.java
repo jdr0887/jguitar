@@ -27,16 +27,16 @@ import org.apache.openjpa.persistence.jdbc.Index;
 @XmlRootElement(name = "song")
 @Entity
 @Table(schema = "jguitar", name = "song")
-@NamedQueries({ @NamedQuery(name = "Song.findAll", query = "SELECT a FROM Song a order by a.name"),
-        @NamedQuery(name = "Song.findByName", query = "SELECT a FROM Song a where a.name = :name") })
+@NamedQueries({ @NamedQuery(name = "Song.findAll", query = "SELECT a FROM Song a order by a.title"),
+        @NamedQuery(name = "Song.findByTitle", query = "SELECT a FROM Song a where a.title = :title") })
 public class Song extends PersistantEntity {
 
     private static final long serialVersionUID = -374280900814171392L;
 
     @XmlAttribute
     @Index
-    @Column(name = "name")
-    private String name;
+    @Column(name = "title")
+    private String title;
 
     @Column(name = "artist")
     private String artist;
@@ -72,12 +72,12 @@ public class Song extends PersistantEntity {
         super();
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getArtist() {
@@ -157,9 +157,9 @@ public class Song extends PersistantEntity {
 
     @Override
     public String toString() {
-        return String
-                .format("Song [id=%s, name=%s, artist=%s, album=%s, author=%s, created=%s, copyright=%s, writer=%s, transcriber=%s, comments=%s]",
-                        id, name, artist, album, author, created, copyright, writer, transcriber, comments);
+        return String.format(
+                "Song [id=%s, title=%s, artist=%s, album=%s, author=%s, created=%s, copyright=%s, writer=%s, transcriber=%s, comments=%s]",
+                id, title, artist, album, author, created, copyright, writer, transcriber, comments);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class Song extends PersistantEntity {
         result = prime * result + ((comments == null) ? 0 : comments.hashCode());
         result = prime * result + ((copyright == null) ? 0 : copyright.hashCode());
         result = prime * result + ((created == null) ? 0 : created.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((title == null) ? 0 : title.hashCode());
         result = prime * result + ((transcriber == null) ? 0 : transcriber.hashCode());
         result = prime * result + ((writer == null) ? 0 : writer.hashCode());
         return result;
@@ -217,10 +217,10 @@ public class Song extends PersistantEntity {
                 return false;
         } else if (!created.equals(other.created))
             return false;
-        if (name == null) {
-            if (other.name != null)
+        if (title == null) {
+            if (other.title != null)
                 return false;
-        } else if (!name.equals(other.name))
+        } else if (!title.equals(other.title))
             return false;
         if (transcriber == null) {
             if (other.transcriber != null)

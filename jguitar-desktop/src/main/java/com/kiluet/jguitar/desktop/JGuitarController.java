@@ -5,13 +5,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
+import javax.sound.midi.MidiChannel;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Synthesizer;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -19,12 +26,13 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.JGuitarDAOManager;
+import com.kiluet.jguitar.dao.model.Beat;
+import com.kiluet.jguitar.dao.model.InstrumentString;
 import com.kiluet.jguitar.dao.model.KeyType;
 import com.kiluet.jguitar.dao.model.Measure;
 import com.kiluet.jguitar.dao.model.Scale;
@@ -34,22 +42,32 @@ import com.kiluet.jguitar.dao.model.Track;
 import com.kiluet.jguitar.desktop.components.MeasureCloseSeparatorPane;
 import com.kiluet.jguitar.desktop.components.MeasureHeaderPane;
 import com.kiluet.jguitar.desktop.components.MeasureOpenSeparatorPane;
+import com.kiluet.jguitar.desktop.components.MeasurePane;
+import com.kiluet.jguitar.desktop.components.NoteTextField;
 import com.kiluet.jguitar.desktop.components.ScalePane;
 import com.kiluet.jguitar.desktop.components.SongPane;
-import com.kiluet.jguitar.desktop.player.ScalePlayer;
-import com.kiluet.jguitar.desktop.player.SongPlayer;
+import com.kiluet.jguitar.desktop.components.TrackPane;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.ScheduledService;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -57,10 +75,12 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Duration;
 
 public class JGuitarController extends BorderPane implements Initializable {
 
@@ -68,9 +88,9 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     private static final JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
 
-    private SongPlayer songPlayer;
+    private final Map<String, List<Beat>> beatMap = new LinkedHashMap<String, List<Beat>>();
 
-    private ScalePlayer scalePlayer;
+    private ScheduledExecutorService es;
 
     private Song song;
 
@@ -79,12 +99,6 @@ public class JGuitarController extends BorderPane implements Initializable {
     private Scale scale;
 
     private ScalePane scalePane;
-
-    @FXML
-    private Label dateLabel;
-
-    @FXML
-    private Menu scalesMenu;
 
     @FXML
     private Label statusLabel;
@@ -96,7 +110,13 @@ public class JGuitarController extends BorderPane implements Initializable {
     private VBox notationBox;
 
     @FXML
-    private ListView<Track> trackListView;
+    private TableView<Song> songsTableView;
+
+    @FXML
+    private TabPane playlistTabPane;
+
+    @FXML
+    private TableView<Scale> scalesTableView;
 
     @FXML
     private ToggleGroup beatDurationTypeGroup, modeToggleGroup, voiceToggleGroup;
@@ -106,8 +126,20 @@ public class JGuitarController extends BorderPane implements Initializable {
             sixteenthDurationButton, thritySecondDurationButton, sixtyFouthDurationButton;
 
     @FXML
-    private Button deleteMeasureButton, previousMeasureButton, slowerVelocityButton, playSongButton,
-            fasterVelocityButton, nextMeasureButton, addMeasureButton;
+    private Button playButton;
+
+    @FXML
+    private ComboBox<String> speedComboBox;
+
+    private List<Beat> previousBeats;
+
+    private List<Beat> currentBeats;
+
+    private Iterator<List<Beat>> beatIter;
+
+    private Integer measureIndex;
+
+    private Synthesizer synthesizer;
 
     private Main app;
 
@@ -118,78 +150,64 @@ public class JGuitarController extends BorderPane implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        dateLabel.setText(DateFormatUtils.ISO_DATE_FORMAT.format(new Date()));
-
-        Map<String, Menu> menuMap = new HashMap<>();
-        for (KeyType keyType : KeyType.values()) {
-            menuMap.put(keyType.name(), new Menu(keyType.name()));
-        }
-        for (KeyType keyType : KeyType.values()) {
-            try {
-                List<Scale> scales = daoMgr.getDaoBean().getScaleDAO().findByKeyAndType(keyType, ScaleType.HEPTATONIC);
-                scales.forEach(p -> menuMap.get(keyType.name()).getItems().add(new MenuItem(p.getName()) {
-                    {
-                        setOnAction(e -> {
-                            try {
-                                Scale scale = daoMgr.getDaoBean().getScaleDAO().findById(p.getId());
-                                getNotationBox().getChildren().clear();
-                                ScalePane scalePane = new ScalePane(JGuitarController.this, scale);
-                                getNotationBox().getChildren().add(scalePane);
-                                scalePlayer = new ScalePlayer(JGuitarController.this, scale);
-                            } catch (Exception e1) {
-                                e1.printStackTrace();
-                            }
-                        });
-                    }
-                }));
-            } catch (JGuitarDAOException e) {
-                e.printStackTrace();
-            }
-        }
-        Menu heptatonicMenu = new Menu(StringUtils.capitalize(ScaleType.HEPTATONIC.name().toLowerCase()));
-        menuMap.values().forEach(p -> heptatonicMenu.getItems().add(p));
-        scalesMenu.getItems().add(heptatonicMenu);
-
-        for (KeyType keyType : KeyType.values()) {
-            menuMap.put(keyType.name(), new Menu(keyType.name()));
-        }
-        for (KeyType keyType : KeyType.values()) {
-            try {
-                List<Scale> scales = daoMgr.getDaoBean().getScaleDAO().findByKeyAndType(keyType, ScaleType.PENTATONIC);
-                scales.forEach(p -> menuMap.get(keyType.name()).getItems().add(new MenuItem(p.getName()) {
-                    {
-                        setOnAction(e -> {
-                            try {
-                                Scale scale = daoMgr.getDaoBean().getScaleDAO().findById(p.getId());
-                                getNotationBox().getChildren().clear();
-                                ScalePane scalePane = new ScalePane(JGuitarController.this, scale);
-                                getNotationBox().getChildren().add(scalePane);
-                                scalePlayer = new ScalePlayer(JGuitarController.this, scale);
-                            } catch (Exception e1) {
-                                e1.printStackTrace();
-                            }
-                        });
-                    }
-                }));
-            } catch (JGuitarDAOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        Menu pentatonicMenu = new Menu(StringUtils.capitalize(ScaleType.PENTATONIC.name().toLowerCase()));
-        menuMap.values().forEach(p -> pentatonicMenu.getItems().add(p));
-        scalesMenu.getItems().add(pentatonicMenu);
-
         try {
-            this.song = JGuitarDAOManager.getInstance().getDaoBean().getSongDAO().findByName("Template").get(0);
+            ObservableList<Scale> scalesList = FXCollections.observableArrayList();
+            for (KeyType keyType : KeyType.values()) {
+                List<Scale> scales = daoMgr.getDaoBean().getScaleDAO().findByKeyAndType(keyType, ScaleType.HEPTATONIC);
+                scalesList.addAll(scales);
+                scales = daoMgr.getDaoBean().getScaleDAO().findByKeyAndType(keyType, ScaleType.PENTATONIC);
+                scalesList.addAll(scales);
+            }
+            scalesTableView.setItems(scalesList);
+            scalesTableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Scale>() {
+
+                @Override
+                public void changed(ObservableValue<? extends Scale> observable, Scale oldValue, Scale newValue) {
+                    if (oldValue != newValue) {
+                        getNotationBox().getChildren().clear();
+                        scalePane = new ScalePane(JGuitarController.this, newValue);
+                        getNotationBox().getChildren().add(scalePane);
+                    }
+                }
+
+            });
+
         } catch (JGuitarDAOException e) {
             e.printStackTrace();
         }
 
-        getNotationBox().getChildren().clear();
-        this.songPane = new SongPane(JGuitarController.this, this.song);
-        getNotationBox().getChildren().add(songPane);
-        this.songPlayer = new SongPlayer(JGuitarController.this, song);
+        ObservableList<Song> songsList = FXCollections.observableArrayList();
+        try {
+            this.song = JGuitarDAOManager.getInstance().getDaoBean().getSongDAO().findByTitle("Template").get(0);
+            songsList.add(this.song);
+        } catch (JGuitarDAOException e) {
+            e.printStackTrace();
+        }
+        songsTableView.setItems(songsList);
+        songsTableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Song>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Song> observable, Song oldValue, Song newValue) {
+                if (oldValue != newValue) {
+                    getNotationBox().getChildren().clear();
+                    songPane = new SongPane(JGuitarController.this, newValue);
+                    getNotationBox().getChildren().add(songPane);
+                }
+            }
+
+        });
+        songsTableView.getSelectionModel().selectFirst();
+
+        try {
+            this.synthesizer = MidiSystem.getSynthesizer();
+            this.synthesizer.open();
+        } catch (
+
+        MidiUnavailableException e)
+
+        {
+            e.printStackTrace();
+        }
 
     }
 
@@ -218,7 +236,7 @@ public class JGuitarController extends BorderPane implements Initializable {
         for (Track track : this.song.getTracks()) {
             Measure measure = null;
             for (Measure m : track.getMeasures()) {
-                if (m.getNumber().equals(this.getSongPlayer().getMeasureIndex())) {
+                if (m.getNumber().equals(getMeasureIndex())) {
                     measure = m;
                     break;
                 }
@@ -262,7 +280,7 @@ public class JGuitarController extends BorderPane implements Initializable {
         List<Measure> measuresAccrossTracks = new ArrayList<Measure>();
         for (Track track : this.song.getTracks()) {
             for (Measure m : track.getMeasures()) {
-                if (m.getNumber().equals(this.getSongPlayer().getMeasureIndex())) {
+                if (m.getNumber().equals(this.getMeasureIndex())) {
                     measuresAccrossTracks.add(m);
                     break;
                 }
@@ -361,6 +379,22 @@ public class JGuitarController extends BorderPane implements Initializable {
     }
 
     @FXML
+    private void songsTableViewOnMouseReleased(final MouseEvent event) {
+        getNotationBox().getChildren().clear();
+        Song song = this.songsTableView.getSelectionModel().getSelectedItem();
+        this.songPane = new SongPane(JGuitarController.this, song);
+        getNotationBox().getChildren().add(songPane);
+    }
+
+    @FXML
+    private void scalesTableViewOnMouseReleased(final MouseEvent event) {
+        getNotationBox().getChildren().clear();
+        Scale scale = this.scalesTableView.getSelectionModel().getSelectedItem();
+        this.scalePane = new ScalePane(JGuitarController.this, scale);
+        getNotationBox().getChildren().add(scalePane);
+    }
+
+    @FXML
     private void addTrack(final ActionEvent event) {
 
     }
@@ -375,48 +409,210 @@ public class JGuitarController extends BorderPane implements Initializable {
     }
 
     @FXML
-    private void doPlaySong(final ActionEvent event) {
+    private void moveToNext(final ActionEvent event) {
+        Tab selectedTab = playlistTabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab.getText().equals("Songs")) {
+            this.songsTableView.getSelectionModel().selectNext();
+        } else {
+            this.scalesTableView.getSelectionModel().selectNext();
+        }
+    }
 
-        if (CollectionUtils.isNotEmpty(getNotationBox().getChildren())) {
+    @FXML
+    private void moveToPrevious(final ActionEvent event) {
+        Tab selectedTab = playlistTabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab.getText().equals("Songs")) {
+            this.songsTableView.getSelectionModel().selectPrevious();
+        } else {
+            this.scalesTableView.getSelectionModel().selectPrevious();
+        }
+    }
 
-            if (getNotationBox().getChildren().get(0) instanceof SongPane) {
-
-                if (playSongButton.getText().equals(">")) {
-                    playSongButton.setText("||");
-                    if (songPlayer.isPaused()) {
-                        // start playing
-                        songPlayer.play();
-                    }
-                } else {
-                    playSongButton.setText(">");
-                    if (songPlayer.isPlaying()) {
-                        // stop playing
-                        songPlayer.pause();
-                    }
-                }
-
-            }
-
-            if (getNotationBox().getChildren().get(0) instanceof ScalePane) {
-
-                if (playSongButton.getText().equals(">")) {
-                    playSongButton.setText("||");
-                    if (scalePlayer.isPaused()) {
-                        // start playing
-                        scalePlayer.play();
-                    }
-                } else {
-                    playSongButton.setText(">");
-                    if (scalePlayer.isPlaying()) {
-                        // stop playing
-                        scalePlayer.pause();
+    @FXML
+    private void play(final ActionEvent event) {
+        logger.info("ENTERING play()");
+        playButton.setText("||");
+        beatMap.clear();
+        if (getNotationBox().getChildren().get(0) instanceof SongPane) {
+            for (Track track : this.song.getTracks()) {
+                for (Measure measure : track.getMeasures()) {
+                    for (Beat beat : measure.getBeats()) {
+                        String key = String.format("%d_%d", measure.getNumber(), beat.getNumber());
+                        if (beatMap.get(key) == null) {
+                            beatMap.put(key, new LinkedList<Beat>());
+                        }
+                        beatMap.get(key).add(beat);
                     }
                 }
-
             }
+        } else {
+            for (Measure measure : this.scale.getTrack().getMeasures()) {
+                for (Beat beat : measure.getBeats()) {
+                    String key = String.format("%d_%d", measure.getNumber(), beat.getNumber());
+                    if (beatMap.get(key) == null) {
+                        beatMap.put(key, new LinkedList<Beat>());
+                    }
+                    beatMap.get(key).add(beat);
+                }
+            }
+        }
+        this.beatIter = beatMap.values().iterator();
 
+        this.es = Executors.newSingleThreadScheduledExecutor();
+
+        logger.info("measureIndex = {}", measureIndex);
+        if (measureIndex != null) {
+            for (int i = 0; i < measureIndex - 1; i++) {
+                previousBeats = currentBeats;
+                currentBeats = beatIter.next();
+            }
         }
 
+        if (currentBeats == null && beatIter.hasNext()) {
+            currentBeats = beatIter.next();
+        }
+
+        Integer tempo = currentBeats.get(0).getMeasure().getTempo();
+
+        Double tempoInMillis = Double.valueOf(((60D / tempo.doubleValue()) * 1000));
+        logger.info(tempoInMillis.toString());
+
+        Double speed = Double.valueOf(getSpeedComboBox().getSelectionModel().getSelectedItem());
+        tempoInMillis += (tempoInMillis - Double.valueOf(tempoInMillis * speed / 100D));
+        logger.info(tempoInMillis.toString());
+
+        ScheduledService<List<Beat>> svc = new ScheduledService<List<Beat>>() {
+
+            @Override
+            protected Task<List<Beat>> createTask() {
+
+                return new Task<List<Beat>>() {
+
+                    @Override
+                    protected List<Beat> call() {
+
+                        try {
+
+                            MidiChannel[] channels = synthesizer.getChannels();
+
+                            if (CollectionUtils.isNotEmpty(previousBeats)) {
+
+                                for (Beat beat : previousBeats) {
+                                    logger.info(beat.getMeasure().getTrack().getInstrument().toString());
+                                    channels[beat.getMeasure().getTrack().getNumber() - 1].allNotesOff();
+                                    TrackPane trackPane = (TrackPane) getNotationBox().getChildren().get(0).lookup(
+                                            String.format("#TrackPane_%d", beat.getMeasure().getTrack().getId()));
+                                    MeasurePane measurePane = (MeasurePane) trackPane
+                                            .lookup(String.format("#MeasurePane_%d", beat.getMeasure().getId()));
+                                    List<InstrumentString> instrumentStrings = beat.getMeasure().getTrack()
+                                            .getInstrument().getStrings();
+                                    for (InstrumentString instrumentString : instrumentStrings) {
+                                        NoteTextField noteTextField = (NoteTextField) measurePane.lookup(String.format(
+                                                "#NoteTextField_%d_%d_%d_%d", beat.getMeasure().getTrack().getId(),
+                                                beat.getMeasure().getNumber(), beat.getNumber(),
+                                                instrumentString.getString()));
+                                        if (noteTextField != null && StringUtils.isNotEmpty(noteTextField.getText())) {
+                                            noteTextField.colorBlack();
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            for (Beat beat : currentBeats) {
+                                logger.info(beat.getMeasure().getTrack().getInstrument().toString());
+                                channels[beat.getMeasure().getTrack().getNumber() - 1].programChange(0,
+                                        beat.getMeasure().getTrack().getInstrument().getProgram());
+
+                                TrackPane trackPane = (TrackPane) getNotationBox().getChildren().get(0)
+                                        .lookup(String.format("#TrackPane_%d", beat.getMeasure().getTrack().getId()));
+                                MeasurePane measurePane = (MeasurePane) trackPane
+                                        .lookup(String.format("#MeasurePane_%d", beat.getMeasure().getId()));
+
+                                List<InstrumentString> instrumentStrings = beat.getMeasure().getTrack().getInstrument()
+                                        .getStrings();
+                                for (InstrumentString instrumentString : instrumentStrings) {
+                                    NoteTextField noteTextField = (NoteTextField) measurePane
+                                            .lookup(String.format("#NoteTextField_%d_%d_%d_%d",
+                                                    beat.getMeasure().getTrack().getId(), beat.getMeasure().getNumber(),
+                                                    beat.getNumber(), instrumentString.getString()));
+                                    if (noteTextField != null && StringUtils.isNotEmpty(noteTextField.getText())) {
+                                        noteTextField.colorRed();
+                                        logger.info(instrumentString.getPitch()
+                                                + Integer.valueOf(noteTextField.getText()).toString());
+                                        channels[beat.getMeasure().getTrack().getNumber() - 1].noteOn(
+                                                instrumentString.getPitch() + Integer.valueOf(noteTextField.getText()),
+                                                200);
+                                    }
+
+                                }
+
+                            }
+
+                            previousBeats = currentBeats;
+                            if (beatIter.hasNext()) {
+                                currentBeats = beatIter.next();
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        return currentBeats;
+
+                    }
+
+                };
+
+            }
+
+        };
+        svc.setOnScheduled(new EventHandler<WorkerStateEvent>() {
+
+            @Override
+            public void handle(WorkerStateEvent event) {
+                if (currentBeats == previousBeats) {
+                    svc.cancel();
+                    try {
+                        Thread.sleep(Double.valueOf(svc.getDelay().toMillis()).longValue());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (CollectionUtils.isNotEmpty(currentBeats)) {
+
+                        for (Beat beat : currentBeats) {
+                            TrackPane trackPane = (TrackPane) getNotationBox().getChildren().get(0)
+                                    .lookup(String.format("#TrackPane_%d", beat.getMeasure().getTrack().getId()));
+                            MeasurePane measurePane = (MeasurePane) trackPane
+                                    .lookup(String.format("#MeasurePane_%d", beat.getMeasure().getId()));
+                            List<InstrumentString> instrumentStrings = beat.getMeasure().getTrack().getInstrument()
+                                    .getStrings();
+                            for (InstrumentString instrumentString : instrumentStrings) {
+                                NoteTextField noteTextField = (NoteTextField) measurePane.lookup(String.format(
+                                        "#NoteTextField_%d_%d_%d_%d", beat.getMeasure().getTrack().getId(),
+                                        beat.getMeasure().getNumber(), beat.getNumber(), instrumentString.getString()));
+                                if (noteTextField != null && StringUtils.isNotEmpty(noteTextField.getText())) {
+                                    noteTextField.colorBlack();
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+
+        });
+        svc.setDelay(Duration.ZERO);
+        svc.setPeriod(Duration.millis(tempoInMillis));
+        svc.start();
+    }
+
+    @FXML
+    private void pause(final ActionEvent event) {
+        logger.info("ENTERING pause()");
+        playButton.setText(">");
+        this.es.shutdownNow();
     }
 
     @FXML
@@ -513,22 +709,6 @@ public class JGuitarController extends BorderPane implements Initializable {
         this.app = app;
     }
 
-    public SongPlayer getSongPlayer() {
-        return songPlayer;
-    }
-
-    public void setSongPlayer(SongPlayer songPlayer) {
-        this.songPlayer = songPlayer;
-    }
-
-    public ScalePlayer getScalePlayer() {
-        return scalePlayer;
-    }
-
-    public void setScalePlayer(ScalePlayer scalePlayer) {
-        this.scalePlayer = scalePlayer;
-    }
-
     public Scale getScale() {
         return scale;
     }
@@ -559,14 +739,6 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     public void setNotationBox(VBox notationBox) {
         this.notationBox = notationBox;
-    }
-
-    public ListView<Track> getTrackListView() {
-        return trackListView;
-    }
-
-    public void setTrackListView(ListView<Track> trackListView) {
-        this.trackListView = trackListView;
     }
 
     public ToggleButton getWholeDurationButton() {
@@ -625,60 +797,20 @@ public class JGuitarController extends BorderPane implements Initializable {
         this.sixtyFouthDurationButton = sixtyFouthDurationButton;
     }
 
-    public Button getDeleteMeasureButton() {
-        return deleteMeasureButton;
+    public ComboBox<String> getSpeedComboBox() {
+        return speedComboBox;
     }
 
-    public void setDeleteMeasureButton(Button deleteMeasureButton) {
-        this.deleteMeasureButton = deleteMeasureButton;
+    public void setSpeedComboBox(ComboBox<String> speedComboBox) {
+        this.speedComboBox = speedComboBox;
     }
 
-    public Button getPreviousMeasureButton() {
-        return previousMeasureButton;
+    public Integer getMeasureIndex() {
+        return measureIndex;
     }
 
-    public void setPreviousMeasureButton(Button previousMeasureButton) {
-        this.previousMeasureButton = previousMeasureButton;
-    }
-
-    public Button getSlowerVelocityButton() {
-        return slowerVelocityButton;
-    }
-
-    public void setSlowerVelocityButton(Button slowerVelocityButton) {
-        this.slowerVelocityButton = slowerVelocityButton;
-    }
-
-    public Button getPlaySongButton() {
-        return playSongButton;
-    }
-
-    public void setPlaySongButton(Button playSongButton) {
-        this.playSongButton = playSongButton;
-    }
-
-    public Button getFasterVelocityButton() {
-        return fasterVelocityButton;
-    }
-
-    public void setFasterVelocityButton(Button fasterVelocityButton) {
-        this.fasterVelocityButton = fasterVelocityButton;
-    }
-
-    public Button getNextMeasureButton() {
-        return nextMeasureButton;
-    }
-
-    public void setNextMeasureButton(Button nextMeasureButton) {
-        this.nextMeasureButton = nextMeasureButton;
-    }
-
-    public Button getAddMeasureButton() {
-        return addMeasureButton;
-    }
-
-    public void setAddMeasureButton(Button addMeasureButton) {
-        this.addMeasureButton = addMeasureButton;
+    public void setMeasureIndex(Integer measureIndex) {
+        this.measureIndex = measureIndex;
     }
 
 }

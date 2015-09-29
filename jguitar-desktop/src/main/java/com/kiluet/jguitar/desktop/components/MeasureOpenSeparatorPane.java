@@ -151,22 +151,7 @@ public class MeasureOpenSeparatorPane extends GridPane {
                 Line b = new Line(0, 0, 0, (instrumentStrings.size() - 1) * 18);
                 b.setStrokeWidth(1);
                 add(b, 0, 0, 1, instrumentStrings.size() + 1);
-
-                for (int i = 0; i < instrumentStrings.size(); i++) {
-
-                    StackPane stackPane = new StackPane();
-                    // -fx-border-color: red;
-                    stackPane.setMinHeight(18);
-                    stackPane.setMaxHeight(18);
-                    stackPane.setStyle("-fx-padding: 0;");
-
-                    Line line = new Line(0, i + 1 * 10, 10, i + 1 * 10);
-                    line.setStroke(Color.LIGHTGRAY);
-
-                    stackPane.getChildren().addAll(line);
-
-                    add(stackPane, 1, i + 1);
-                }
+                GridPane.setMargin(b, new Insets(9, 0, 0, 0));
 
             }
 

@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import java.util.*?>
+<?import java.text.*?>
 <?import javafx.collections.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane prefHeight="600" prefWidth="1200" stylesheets="@JGuitar.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane prefHeight="800" prefWidth="1200" stylesheets="@JGuitar.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="com.kiluet.jguitar.desktop.JGuitarController">
   <fx:define>
     <ToggleGroup fx:id="beatDurationTypeGroup" />
@@ -44,7 +50,6 @@
             <RadioMenuItem mnemonicParsing="false" onAction="#doSelectVoice2" text="Select Voice 2" toggleGroup="$voiceToggleGroup" />
           </items>
         </Menu>
-        <Menu fx:id="scalesMenu" mnemonicParsing="false" text="Scales" />
       </menus>
     </MenuBar>
   </top>
@@ -52,14 +57,24 @@
     <BorderPane>
       <top>
         <ToolBar fx:id="controlsToolBar">
-          <Button text="&gt;" fx:id="playSongButton" onAction="#doPlaySong">
+          <Button text="&gt;" fx:id="playButton" onAction="#play">
+            <tooltip>
+              <Tooltip text="Play" />
+            </tooltip>
+          </Button>
+          <Button text="|&lt;&lt;" fx:id="moveToPreviousButton" onAction="#moveToPrevious">
+            <tooltip>
+              <Tooltip text="Play" />
+            </tooltip>
+          </Button>
+          <Button text="&gt;&gt;|" fx:id="moveToNextButton" onAction="#moveToNext">
             <tooltip>
               <Tooltip text="Play" />
             </tooltip>
           </Button>
           <Separator />
           <Label text="Speed:" />
-          <ComboBox prefWidth="75.0">
+          <ComboBox fx:id="speedComboBox" prefWidth="75.0">
             <items>
               <FXCollections fx:factory="observableArrayList">
                 <String fx:value="100" />
@@ -68,6 +83,10 @@
                 <String fx:value="70" />
                 <String fx:value="60" />
                 <String fx:value="50" />
+                <String fx:value="40" />
+                <String fx:value="30" />
+                <String fx:value="20" />
+                <String fx:value="10" />
               </FXCollections>
             </items>
             <value>
@@ -102,22 +121,63 @@
         </ToolBar>
       </top>
       <center>
-        <ScrollPane styleClass="rightScrollPane" vbarPolicy="ALWAYS" hbarPolicy="ALWAYS">
-          <VBox fx:id="notationBox" styleClass="notationBox" />
-        </ScrollPane>
+        <SplitPane orientation="VERTICAL" dividerPositions="0.65">
+          <items>
+            <ScrollPane styleClass="rightScrollPane" vbarPolicy="ALWAYS" hbarPolicy="ALWAYS">
+              <VBox fx:id="notationBox" styleClass="notationBox" />
+            </ScrollPane>
+            <TabPane fx:id="playlistTabPane" prefHeight="100" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Songs">
+                  <TableView fx:id="songsTableView" onMouseReleased="#songsTableViewOnMouseReleased">
+                    <columns>
+                      <TableColumn text="Title">
+                        <cellValueFactory>
+                          <PropertyValueFactory property="title" />
+                        </cellValueFactory>
+                      </TableColumn>
+                      <TableColumn text="Artist">
+                        <cellValueFactory>
+                          <PropertyValueFactory property="artist" />
+                        </cellValueFactory>
+                      </TableColumn>
+                      <TableColumn text="Album">
+                        <cellValueFactory>
+                          <PropertyValueFactory property="album" />
+                        </cellValueFactory>
+                      </TableColumn>
+                    </columns>
+                  </TableView>
+                </Tab>
+                <Tab text="Scales">
+                  <TableView fx:id="scalesTableView" onMouseReleased="#scalesTableViewOnMouseReleased">
+                    <columns>
+                      <TableColumn text="Name">
+                        <cellValueFactory>
+                          <PropertyValueFactory property="name" />
+                        </cellValueFactory>
+                      </TableColumn>
+                      <TableColumn text="Type">
+                        <cellValueFactory>
+                          <PropertyValueFactory property="type" />
+                        </cellValueFactory>
+                      </TableColumn>
+                      <TableColumn text="Key">
+                        <cellValueFactory>
+                          <PropertyValueFactory property="key" />
+                        </cellValueFactory>
+                      </TableColumn>
+                    </columns>
+                  </TableView>
+                </Tab>
+              </tabs>
+            </TabPane>
+          </items>
+        </SplitPane>
       </center>
-      <bottom>
-      </bottom>
     </BorderPane>
   </center>
   <bottom>
-    <HBox>
-      <children>
-        <Label fx:id="dateLabel" />
-        <Separator HBox.hgrow="ALWAYS" />
-        <Label fx:id="statusLabel" />
-      </children>
-    </HBox>
   </bottom>
 </BorderPane>
 

@@ -22,4 +22,51 @@
       <artifactId>jguitar-config</artifactId>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-assembly-plugin</artifactId>
+	<executions>
+	  <execution>
+	    <goals>
+	      <goal>attached</goal>
+	    </goals>
+	    <phase>package</phase>
+	    <configuration>
+	      <descriptorRefs>
+		<descriptorRef>jar-with-dependencies</descriptorRef>
+	      </descriptorRefs>
+	      <archive>
+		<manifest>
+		  <mainClass>com.kiluet.jguitar.desktop.Main</mainClass>
+		</manifest>
+	      </archive>
+	    </configuration>
+	  </execution>
+	</executions>
+      </plugin>
+      <plugin>
+	<artifactId>maven-antrun-plugin</artifactId>
+	<executions>
+	  <execution>
+	    <id>0</id>
+	    <phase>validate</phase>
+	    <configuration>
+	      <tasks>
+		<delete file="${basedir}/src/main/resources/com/kiluet/jguitar/desktop/jguitar.properties" />
+		<touch file="${basedir}/src/main/resources/com/kiluet/jguitar/desktop/jguitar.properties" mkdirs="true" />
+		<echo file="${basedir}/src/main/resources/com/kiluet/jguitar/desktop/jguitar.properties" append="true">
+version=${project.version}
+		</echo>
+	      </tasks>
+	    </configuration>
+	    <goals>
+	      <goal>run</goal>
+	    </goals>
+	  </execution>
+	</executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

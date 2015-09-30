@@ -35,6 +35,29 @@
     <openjpa.version>2.4.0</openjpa.version>
     <derby.version>10.11.1.1</derby.version>
   </properties>
+  <organization>
+    <name>KILUET</name>
+    <url>http://www.kiluet.com/</url>
+  </organization>  
+  <developers>
+    <developer>
+      <id>jdr0887</id>
+      <name>Jason Reilly</name>
+      <email>jdr0887@renci.org</email>
+      <url>https://github.com/jdr0887</url>
+      <organization>KILUET</organization>
+      <organizationUrl>http://www.kiluet.com/</organizationUrl>
+      <roles>
+        <role>Senior Developer</role>
+      </roles>
+    </developer>
+  </developers>  
+  <scm>
+    <url>https://github.com/jdr0887/jguitar</url>
+    <developerConnection>scm:git:git@github.com:jdr0887/jguitar.git</developerConnection>
+    <connection>scm:git:git@github.com:jdr0887/jguitar.git</connection>
+    <tag>HEAD</tag>
+  </scm>  
   <licenses>    
     <license>
       <name>GNU GENERAL PUBLIC LICENSE</name>
@@ -42,6 +65,36 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <repositories>
+    <repository>
+      <id>kiluet.repository</id>
+      <name>kiluet.repository</name>
+      <url>http://archiva.renci.org:8080/repository/internal</url>
+      <releases>
+	<enabled>true</enabled>
+      </releases>
+      <snapshots>
+	<enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <distributionManagement>
+    <repository>
+      <id>kiluet.repository</id>
+      <name>kiluet.repository</name>
+      <url>http://archiva.renci.org:8080/repository/internal</url>
+    </repository>
+    <snapshotRepository>
+      <id>kiluet.repository</id>
+      <name>kiluet.repository</name>
+      <url>http://archiva.renci.org:8080/repository/snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>kiluet.site</id>
+      <name>kiluet.site</name>
+      <url>file:///${user.home}/sites/${project.groupId}/${project.artifactId}</url>
+    </site>
+  </distributionManagement>    
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -192,12 +245,65 @@
 	</configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <preparationGoals>clean install</preparationGoals>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+	<version>${maven.javadoc.plugin.version}</version>	
+        <configuration>
+          <additionalparam>-Xdoclint:none</additionalparam>
+        </configuration>
+      </plugin>      
+      <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-surefire-plugin</artifactId>
 	<configuration>
 	  <skip>true</skip>
 	</configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>${maven.site.plugin.version}</version>
+        <configuration>
+	  <reportPlugins>
+	    <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-project-info-reports-plugin</artifactId>
+	      <version>${maven.project.info.reports.plugin.version}</version>
+	      <configuration>
+		<dependencyDetailsEnabled>true</dependencyDetailsEnabled>
+		<dependencyLocationsEnabled>true</dependencyLocationsEnabled>
+	      </configuration>
+	      <reports>
+	      </reports>
+	    </plugin>
+	    <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-javadoc-plugin</artifactId>
+	      <version>${maven.javadoc.plugin.version}</version>
+              <configuration>
+                <additionalparam>-Xdoclint:none</additionalparam>
+              </configuration>	      
+	    </plugin>
+	    <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-surefire-report-plugin</artifactId>
+	      <version>${maven.surefire.report.plugin.version}</version>
+	    </plugin>
+	    <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-changelog-plugin</artifactId>
+	      <version>${maven.changelog.plugin.version}</version>
+	    </plugin>	    
+	  </reportPlugins>
+        </configuration>
+      </plugin>                  
     </plugins>
   </build>
   <modules>

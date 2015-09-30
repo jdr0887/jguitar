@@ -1,7 +1,5 @@
 package com.kiluet.jguitar.desktop.components;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 
 public class NoteTextField extends TextField {
@@ -10,19 +8,21 @@ public class NoteTextField extends TextField {
         super();
         setMaxWidth(18);
         colorBlack();
-        this.textProperty().addListener(new ChangeListener<String>() {
-
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (newValue.startsWith("0") && newValue.length() == 2) {
-                    setText(newValue.replaceFirst("0", ""));
-                }
-                if (newValue.length() > 2) {
-                    setText(oldValue);
-                }
-            }
-
-        });
+        // this.textProperty().addListener(new ChangeListener<String>() {
+        //
+        // @Override
+        // public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        // if (newValue.startsWith("0") && newValue.length() == 2) {
+        // setText(newValue.replaceFirst("0", ""));
+        // }
+        // if (newValue.length() > 2) {
+        // setText(oldValue);
+        // }
+        //
+        //
+        // }
+        //
+        // });
     }
 
     public void colorRed() {

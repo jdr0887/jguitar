@@ -114,8 +114,8 @@
           <Separator />
           <MenuButton text="Measures">
             <items>
-              <MenuItem onAction="#addMeasure" text="Add" />
-              <MenuItem onAction="#removeMeasure" text="Remove" />
+              <MenuItem text="Add" onAction="#addMeasure" />
+              <MenuItem text="Remove" onAction="#removeMeasure" />
             </items>
           </MenuButton>
         </ToolBar>

@@ -1,12 +1,11 @@
 package com.kiluet.jguitar.desktop.components;
 
-import java.util.List;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kiluet.jguitar.dao.model.Beat;
-import com.kiluet.jguitar.dao.model.InstrumentString;
+import com.kiluet.jguitar.dao.JGuitarDAOManager;
 import com.kiluet.jguitar.dao.model.Measure;
 import com.kiluet.jguitar.dao.model.Track;
 import com.kiluet.jguitar.desktop.JGuitarController;
@@ -18,6 +17,8 @@ import javafx.scene.layout.GridPane;
 public class TrackPane extends GridPane {
 
     private static final Logger logger = LoggerFactory.getLogger(TrackPane.class);
+
+    private static final JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
 
     private JGuitarController jguitarController;
 
@@ -38,7 +39,7 @@ public class TrackPane extends GridPane {
 
         Measure previousMeasure = null;
 
-        List<InstrumentString> instrumentStrings = track.getInstrument().getStrings();
+        Collections.sort(track.getMeasures(), (m1, m2) -> m1.getNumber().compareTo(m2.getNumber()));
 
         for (Measure measure : track.getMeasures()) {
 
@@ -66,78 +67,6 @@ public class TrackPane extends GridPane {
             // add(measureFooterPane, measure.getNumber(), 3);
 
             previousMeasure = measure;
-
-        }
-
-        String noteTextFieldLookupFormat = "#NoteTextField_%d_%d_%d_%d";
-        // navigation
-        for (Measure measure : track.getMeasures()) {
-
-            for (Beat beat : measure.getBeats()) {
-
-                for (InstrumentString instrumentString : instrumentStrings) {
-
-                    String currentNoteTextFieldId = String.format(noteTextFieldLookupFormat, track.getId(),
-                            measure.getNumber(), beat.getNumber(), instrumentString.getString());
-
-                    NoteTextField noteTextField = (NoteTextField) lookup(currentNoteTextFieldId);
-
-                    noteTextField.setOnKeyReleased(e -> {
-
-                        if (e.getCode().isArrowKey()) {
-                            NoteTextField proximalNoteTextField = null;
-                            switch (e.getCode()) {
-                                case RIGHT:
-                                    String rightOfNoteTextFieldId = null;
-                                    if (beat.getNumber() == measure.getBeats().size()) {
-                                        rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, track.getId(),
-                                                measure.getNumber() + 1, 1, instrumentString.getString());
-                                    } else {
-                                        rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, track.getId(),
-                                                measure.getNumber(), beat.getNumber() + 1,
-                                                instrumentString.getString());
-                                    }
-                                    logger.debug(rightOfNoteTextFieldId);
-                                    proximalNoteTextField = (NoteTextField) lookup(rightOfNoteTextFieldId);
-                                    break;
-                                case LEFT:
-                                    String leftOfNoteTextFieldId = null;
-                                    if (beat.getNumber() - 1 == 0) {
-                                        leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, track.getId(),
-                                                measure.getNumber() - 1, measure.getBeats().size(),
-                                                instrumentString.getString());
-                                    } else {
-                                        leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, track.getId(),
-                                                measure.getNumber(), beat.getNumber() - 1,
-                                                instrumentString.getString());
-                                    }
-                                    logger.debug(leftOfNoteTextFieldId);
-                                    proximalNoteTextField = (NoteTextField) lookup(leftOfNoteTextFieldId);
-                                    break;
-                                case UP:
-                                    String upOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, track.getId(),
-                                            measure.getNumber(), beat.getNumber(), instrumentString.getString() - 1);
-                                    logger.debug(upOfNoteTextFieldId);
-                                    proximalNoteTextField = (NoteTextField) lookup(upOfNoteTextFieldId);
-                                    break;
-                                case DOWN:
-                                    String downOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
-                                            track.getId(), measure.getNumber(), beat.getNumber(),
-                                            instrumentString.getString() + 1);
-                                    logger.debug(downOfNoteTextFieldId);
-                                    proximalNoteTextField = (NoteTextField) lookup(downOfNoteTextFieldId);
-                                    break;
-                            }
-                            if (proximalNoteTextField != null) {
-                                proximalNoteTextField.requestFocus();
-                            }
-
-                        }
-
-                    });
-
-                }
-            }
 
         }
 

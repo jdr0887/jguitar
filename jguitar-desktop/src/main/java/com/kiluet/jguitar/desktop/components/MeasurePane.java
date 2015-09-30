@@ -85,6 +85,75 @@ public class MeasurePane extends GridPane {
                             break;
                     }
                 });
+
+                noteTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue.startsWith("0") && newValue.length() == 2) {
+                        newValue = newValue.replaceFirst("0", "");
+                    }
+                    if (newValue.length() > 2) {
+                        newValue = oldValue;
+                    }
+                });
+
+                String noteTextFieldLookupFormat = "#NoteTextField_%d_%d_%d_%d";
+
+                noteTextField.setOnKeyReleased(e -> {
+
+                    if (e.getCode().isArrowKey()) {
+                        NoteTextField proximalNoteTextField = null;
+                        switch (e.getCode()) {
+                            case RIGHT:
+                                String rightOfNoteTextFieldId = null;
+                                if (beat.getNumber() == measure.getBeats().size()) {
+                                    rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                            measure.getTrack().getId(), measure.getNumber() + 1, 1,
+                                            instrumentString.getString());
+                                } else {
+                                    rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                            measure.getTrack().getId(), measure.getNumber(), beat.getNumber() + 1,
+                                            instrumentString.getString());
+                                }
+                                logger.info(rightOfNoteTextFieldId);
+                                proximalNoteTextField = (NoteTextField) this.getParent().lookup(rightOfNoteTextFieldId);
+                                break;
+                            case LEFT:
+                                String leftOfNoteTextFieldId = null;
+                                if (measure.getNumber() > 1 && beat.getNumber() == 1) {
+                                    Measure pMeasure = measure.getTrack().getMeasures().get(measure.getNumber() - 2);
+                                    leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                            measure.getTrack().getId(), pMeasure.getNumber(),
+                                            pMeasure.getBeats().size(), instrumentString.getString());
+                                } else {
+                                    leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                            measure.getTrack().getId(), measure.getNumber(), beat.getNumber() - 1,
+                                            instrumentString.getString());
+                                }
+                                logger.info(leftOfNoteTextFieldId);
+                                proximalNoteTextField = (NoteTextField) this.getParent().lookup(leftOfNoteTextFieldId);
+                                break;
+                            case UP:
+                                String upOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                        measure.getTrack().getId(), measure.getNumber(), beat.getNumber(),
+                                        instrumentString.getString() - 1);
+                                logger.info(upOfNoteTextFieldId);
+                                proximalNoteTextField = (NoteTextField) this.getParent().lookup(upOfNoteTextFieldId);
+                                break;
+                            case DOWN:
+                                String downOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
+                                        measure.getTrack().getId(), measure.getNumber(), beat.getNumber(),
+                                        instrumentString.getString() + 1);
+                                logger.info(downOfNoteTextFieldId);
+                                proximalNoteTextField = (NoteTextField) this.getParent().lookup(downOfNoteTextFieldId);
+                                break;
+                        }
+                        if (proximalNoteTextField != null) {
+                            proximalNoteTextField.requestFocus();
+                        }
+
+                    }
+
+                });
+
                 stackPane.getChildren().addAll(line, noteTextField);
 
                 for (Note note : beat.getNotes()) {

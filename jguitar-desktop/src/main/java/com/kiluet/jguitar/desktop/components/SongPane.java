@@ -1,6 +1,5 @@
 package com.kiluet.jguitar.desktop.components;
 
-import com.kiluet.jguitar.dao.model.Song;
 import com.kiluet.jguitar.dao.model.Track;
 import com.kiluet.jguitar.desktop.JGuitarController;
 
@@ -13,12 +12,9 @@ public class SongPane extends GridPane {
 
     private JGuitarController jguitarController;
 
-    private Song song;
-
-    public SongPane(JGuitarController jguitarController, Song song) {
+    public SongPane(JGuitarController jguitarController) {
         super();
         this.jguitarController = jguitarController;
-        this.song = song;
         init();
     }
 
@@ -31,20 +27,12 @@ public class SongPane extends GridPane {
         getColumnConstraints().add(columnConstraints);
 
         int row = 0;
-        for (Track track : song.getTracks()) {
+        for (Track track : jguitarController.getSong().getTracks()) {
             TrackPane trackPane = new TrackPane(jguitarController, track);
             add(trackPane, 0, row);
             GridPane.setHalignment(trackPane, HPos.LEFT);
             row++;
         }
-    }
-
-    public Song getSong() {
-        return song;
-    }
-
-    public void setSong(Song song) {
-        this.song = song;
     }
 
 }

@@ -2,10 +2,13 @@ package com.kiluet.jguitar.dao;
 
 import org.junit.Test;
 
-import com.kiluet.jguitar.dao.JGuitarDAOException;
-import com.kiluet.jguitar.dao.JGuitarDAOManager;
+import com.kiluet.jguitar.dao.model.Beat;
 import com.kiluet.jguitar.dao.model.Instrument;
 import com.kiluet.jguitar.dao.model.InstrumentString;
+import com.kiluet.jguitar.dao.model.Measure;
+import com.kiluet.jguitar.dao.model.Note;
+import com.kiluet.jguitar.dao.model.Song;
+import com.kiluet.jguitar.dao.model.Track;
 
 public class Serialization {
 
@@ -25,7 +28,28 @@ public class Serialization {
         } catch (JGuitarDAOException e) {
             e.printStackTrace();
         }
+    }
 
+    @Test
+    public void checkingMeasures() {
+        try {
+            Song song = daoMgr.getDaoBean().getSongDAO().findByTitle("Template").get(0);
+            System.out.println(song.toString());
+            for (Track track : song.getTracks()) {
+                System.out.println(track.toString());
+                for (Measure measure : track.getMeasures()) {
+                    System.out.println(measure.toString());
+                    for (Beat beat : measure.getBeats()) {
+                        System.out.println(beat.toString());
+                        for (Note note : beat.getNotes()) {
+                            System.out.println(note.toString());
+                        }
+                    }
+                }
+            }
+        } catch (JGuitarDAOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

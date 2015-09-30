@@ -76,12 +76,27 @@ public class Measure extends PersistantEntity {
         super();
     }
 
+    public Measure(Measure measure) {
+        super();
+        this.track = measure.getTrack();
+        this.meterType = measure.getMeterType();
+        this.tempo = measure.getTempo();
+    }
+
     public Integer getNumber() {
         return number;
     }
 
     public void setNumber(Integer number) {
         this.number = number;
+    }
+
+    public void incrementNumber() {
+        number++;
+    }
+
+    public void decrementNumber() {
+        number--;
     }
 
     public Long getStart() {

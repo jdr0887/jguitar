@@ -1,0 +1,19 @@
+<document>
+  <body>
+    <section name="About jGuitar">
+      <p></p>
+    </section>
+    <section name="Assumptions &amp; Goals">
+      <subsection name="Data Security">
+	<p></p>
+      </subsection>
+    </section>
+    <section name="Technologies Used">
+      <p>
+	<ul>
+	  <li><a href="https://db.apache.org/derby/">Apache Derby</a></li>
+	</ul>
+      </p>
+    </section>
+  </body>
+</document>

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.JGuitarDAOManager;
 import com.kiluet.jguitar.dao.model.Beat;
+import com.kiluet.jguitar.dao.model.DurationType;
 import com.kiluet.jguitar.dao.model.InstrumentString;
 import com.kiluet.jguitar.dao.model.KeyType;
 import com.kiluet.jguitar.dao.model.Measure;
@@ -190,7 +192,7 @@ public class JGuitarController extends BorderPane implements Initializable {
             public void changed(ObservableValue<? extends Song> observable, Song oldValue, Song newValue) {
                 if (oldValue != newValue) {
                     getNotationBox().getChildren().clear();
-                    songPane = new SongPane(JGuitarController.this, newValue);
+                    songPane = new SongPane(JGuitarController.this);
                     getNotationBox().getChildren().add(songPane);
                 }
             }
@@ -201,11 +203,7 @@ public class JGuitarController extends BorderPane implements Initializable {
         try {
             this.synthesizer = MidiSystem.getSynthesizer();
             this.synthesizer.open();
-        } catch (
-
-        MidiUnavailableException e)
-
-        {
+        } catch (MidiUnavailableException e) {
             e.printStackTrace();
         }
 
@@ -223,12 +221,145 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     @FXML
     private void addMeasure(final ActionEvent event) {
+        TextInputDialog input = new TextInputDialog();
+        input.setGraphic(null);
+        input.setHeaderText(null);
+        input.setTitle("Measure Index");
+        input.setContentText("New measure after:");
+        Optional<String> value = input.showAndWait();
+        if (value.isPresent()) {
+            String v = value.get();
+            if (NumberUtils.isNumber(v)) {
+                Integer measureIndex = Integer.valueOf(v);
+                for (Track track : song.getTracks()) {
+                    Measure newMeasure = null;
+                    for (Measure measure : track.getMeasures()) {
+                        try {
+                            if (measure.getNumber() < measureIndex) {
+                                continue;
+                            }
+                            if (measure.getNumber() == measureIndex) {
+                                newMeasure = new Measure(measure);
+                                newMeasure.setNumber(measure.getNumber() + 1);
+                                newMeasure.setId(daoMgr.getDaoBean().getMeasureDAO().save(newMeasure));
 
+                                Beat beat = new Beat(DurationType.WHOLE);
+                                beat.setNumber(1);
+                                beat.setMeasure(newMeasure);
+                                beat.setId(daoMgr.getDaoBean().getBeatDAO().save(beat));
+                                newMeasure.getBeats().add(beat);
+
+                            }
+                            if (measure.getNumber() > measureIndex) {
+                                measure.incrementNumber();
+                                daoMgr.getDaoBean().getMeasureDAO().save(measure);
+                            }
+                        } catch (JGuitarDAOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    try {
+                        track.getMeasures().add(newMeasure);
+                        daoMgr.getDaoBean().getTrackDAO().save(track);
+                    } catch (JGuitarDAOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Node trackNode = this.songPane.lookup(String.format("#TrackPane_%d", track.getId()));
+                    if (trackNode != null) {
+                        TrackPane trackPane = (TrackPane) trackNode;
+                        trackPane.getChildren().clear();
+                        trackPane.init();
+                        trackPane.requestLayout();
+                    }
+
+                    for (Measure measure : track.getMeasures()) {
+                        if (measure.getNumber() < measureIndex) {
+                            continue;
+                        }
+                        if (measure.getNumber() >= measureIndex) {
+                            Node measurePaneNode = trackNode.lookup(String.format("#MeasurePane_%d", measure.getId()));
+                            if (measurePaneNode != null) {
+                                MeasurePane measurePane = (MeasurePane) measurePaneNode;
+                                measurePane.getChildren().clear();
+                                measurePane.init();
+                                measurePane.requestLayout();
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
     }
 
     @FXML
     private void removeMeasure(final ActionEvent event) {
+        TextInputDialog input = new TextInputDialog();
+        input.setGraphic(null);
+        input.setHeaderText(null);
+        input.setTitle("Measure Index");
+        input.setContentText("Measure to remove:");
+        Optional<String> value = input.showAndWait();
+        if (value.isPresent()) {
+            String v = value.get();
+            if (NumberUtils.isNumber(v)) {
+                Integer measureIndex = Integer.valueOf(v);
+                for (Track track : song.getTracks()) {
+                    Iterator<Measure> measureIter = track.getMeasures().iterator();
+                    while (measureIter.hasNext()) {
+                        Measure measure = measureIter.next();
+                        try {
+                            if (measure.getNumber() < measureIndex) {
+                                continue;
+                            }
+                            if (measure.getNumber() == measureIndex) {
+                                for (Beat beat : measure.getBeats()) {
+                                    daoMgr.getDaoBean().getNoteDAO().delete(beat.getNotes());
+                                }
+                                daoMgr.getDaoBean().getBeatDAO().delete(measure.getBeats());
+                                daoMgr.getDaoBean().getMeasureDAO().delete(measure);
+                                measureIter.remove();
+                            }
+                            if (measure.getNumber() > measureIndex) {
+                                try {
+                                    measure.decrementNumber();
+                                    daoMgr.getDaoBean().getMeasureDAO().save(measure);
+                                } catch (JGuitarDAOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } catch (JGuitarDAOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
+                    Node trackNode = this.songPane.lookup(String.format("#TrackPane_%d", track.getId()));
+                    if (trackNode != null) {
+                        TrackPane trackPane = (TrackPane) trackNode;
+                        trackPane.getChildren().clear();
+                        trackPane.init();
+                        trackPane.requestLayout();
+                    }
+
+                    for (Measure measure : track.getMeasures()) {
+                        if (measure.getNumber() < measureIndex) {
+                            continue;
+                        }
+                        if (measure.getNumber() >= measureIndex) {
+                            Node measurePaneNode = trackNode.lookup(String.format("#MeasurePane_%d", measure.getId()));
+                            if (measurePaneNode != null) {
+                                MeasurePane measurePane = (MeasurePane) measurePaneNode;
+                                measurePane.getChildren().clear();
+                                measurePane.init();
+                                measurePane.requestLayout();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @FXML
@@ -381,27 +512,25 @@ public class JGuitarController extends BorderPane implements Initializable {
     @FXML
     private void songsTableViewOnMouseReleased(final MouseEvent event) {
         getNotationBox().getChildren().clear();
-        Song song = this.songsTableView.getSelectionModel().getSelectedItem();
-        this.songPane = new SongPane(JGuitarController.this, song);
+        this.song = this.songsTableView.getSelectionModel().getSelectedItem();
+        this.songPane = new SongPane(JGuitarController.this);
         getNotationBox().getChildren().add(songPane);
     }
 
     @FXML
     private void scalesTableViewOnMouseReleased(final MouseEvent event) {
         getNotationBox().getChildren().clear();
-        Scale scale = this.scalesTableView.getSelectionModel().getSelectedItem();
+        this.scale = this.scalesTableView.getSelectionModel().getSelectedItem();
         this.scalePane = new ScalePane(JGuitarController.this, scale);
         getNotationBox().getChildren().add(scalePane);
     }
 
     @FXML
     private void addTrack(final ActionEvent event) {
-
     }
 
     @FXML
     private void removeTrack(final ActionEvent event) {
-
     }
 
     @FXML
@@ -573,11 +702,7 @@ public class JGuitarController extends BorderPane implements Initializable {
             public void handle(WorkerStateEvent event) {
                 if (currentBeats == previousBeats) {
                     svc.cancel();
-                    try {
-                        Thread.sleep(Double.valueOf(svc.getDelay().toMillis()).longValue());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    playButton.setText(">");
                     if (CollectionUtils.isNotEmpty(currentBeats)) {
 
                         for (Beat beat : currentBeats) {
@@ -811,6 +936,22 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     public void setMeasureIndex(Integer measureIndex) {
         this.measureIndex = measureIndex;
+    }
+
+    public SongPane getSongPane() {
+        return songPane;
+    }
+
+    public void setSongPane(SongPane songPane) {
+        this.songPane = songPane;
+    }
+
+    public ScalePane getScalePane() {
+        return scalePane;
+    }
+
+    public void setScalePane(ScalePane scalePane) {
+        this.scalePane = scalePane;
     }
 
 }

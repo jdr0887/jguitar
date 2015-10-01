@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -64,7 +65,8 @@ public class Measure extends PersistantEntity {
 
     @XmlElementWrapper(name = "beats")
     @XmlElement(name = "beat")
-    @OneToMany(mappedBy = "measure", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "measure", cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @OrderBy("number")
     private List<Beat> beats;
 
     @XmlTransient
@@ -76,11 +78,12 @@ public class Measure extends PersistantEntity {
         super();
     }
 
-    public Measure(Measure measure) {
+    public Measure(Track track, MeterType meterType, Integer tempo, Integer number) {
         super();
-        this.track = measure.getTrack();
-        this.meterType = measure.getMeterType();
-        this.tempo = measure.getTempo();
+        this.track = track;
+        this.meterType = meterType;
+        this.tempo = tempo;
+        this.number = number;
     }
 
     public Integer getNumber() {

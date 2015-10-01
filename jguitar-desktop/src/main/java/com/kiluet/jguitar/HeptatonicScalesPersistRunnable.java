@@ -75,8 +75,8 @@ public class HeptatonicScalesPersistRunnable extends AbstractPersistRunnable {
             }
             logger.info("Creating...{}", scale.toString());
 
-            List<Instrument> instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Guitar");
-            Track track = createTrack(1, instrumentList.get(0));
+            Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
+            Track track = createTrack(1, instrument);
             scale.setTrack(track);
             scale.setId(daoMgr.getDaoBean().getScaleDAO().save(scale));
 
@@ -193,8 +193,8 @@ public class HeptatonicScalesPersistRunnable extends AbstractPersistRunnable {
             }
             logger.info("Creating...{}", scale.toString());
 
-            List<Instrument> instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Guitar");
-            Track track = createTrack(1, instrumentList.get(0));
+            Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
+            Track track = createTrack(1, instrument);
             scale.setTrack(track);
             scale.setId(daoMgr.getDaoBean().getScaleDAO().save(scale));
 
@@ -311,8 +311,8 @@ public class HeptatonicScalesPersistRunnable extends AbstractPersistRunnable {
             }
             logger.info("Creating...{}", scale.toString());
 
-            List<Instrument> instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Guitar");
-            Track track = createTrack(1, instrumentList.get(0));
+            Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
+            Track track = createTrack(1, instrument);
             scale.setTrack(track);
             scale.setId(daoMgr.getDaoBean().getScaleDAO().save(scale));
 
@@ -429,8 +429,8 @@ public class HeptatonicScalesPersistRunnable extends AbstractPersistRunnable {
             }
             logger.info("Creating...{}", scale.toString());
 
-            List<Instrument> instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Guitar");
-            Track track = createTrack(1, instrumentList.get(0));
+            Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
+            Track track = createTrack(1, instrument);
             scale.setTrack(track);
             scale.setId(daoMgr.getDaoBean().getScaleDAO().save(scale));
 
@@ -547,8 +547,8 @@ public class HeptatonicScalesPersistRunnable extends AbstractPersistRunnable {
             }
             logger.info("Creating...{}", scale.toString());
 
-            List<Instrument> instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Guitar");
-            Track track = createTrack(1, instrumentList.get(0));
+            Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
+            Track track = createTrack(1, instrument);
             scale.setTrack(track);
             scale.setId(daoMgr.getDaoBean().getScaleDAO().save(scale));
 
@@ -665,8 +665,8 @@ public class HeptatonicScalesPersistRunnable extends AbstractPersistRunnable {
             }
             logger.info("Creating...{}", scale.toString());
 
-            List<Instrument> instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Guitar");
-            Track track = createTrack(1, instrumentList.get(0));
+            Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
+            Track track = createTrack(1, instrument);
             scale.setTrack(track);
             scale.setId(daoMgr.getDaoBean().getScaleDAO().save(scale));
 
@@ -782,9 +782,9 @@ public class HeptatonicScalesPersistRunnable extends AbstractPersistRunnable {
                 return;
             }
             logger.info("Creating...{}", scale.toString());
-            
-            List<Instrument> instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Guitar");
-            Track track = createTrack(1, instrumentList.get(0));
+
+            Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
+            Track track = createTrack(1, instrument);
             scale.setTrack(track);
             scale.setId(daoMgr.getDaoBean().getScaleDAO().save(scale));
 

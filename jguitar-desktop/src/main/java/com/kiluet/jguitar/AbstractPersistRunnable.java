@@ -22,10 +22,7 @@ public abstract class AbstractPersistRunnable implements Runnable {
     public abstract String getName();
 
     protected Track createTrack(Song song, Integer number, Instrument instrument) throws JGuitarDAOException {
-        Track track = new Track();
-        track.setNumber(number);
-        track.setInstrument(instrument);
-        track.setSong(song);
+        Track track = new Track(song, instrument, number);
         track.setId(daoMgr.getDaoBean().getTrackDAO().save(track));
         song.getTracks().add(track);
         return track;
@@ -40,20 +37,14 @@ public abstract class AbstractPersistRunnable implements Runnable {
     }
 
     protected Measure createMeasure(Track track, Integer number) throws JGuitarDAOException {
-        Measure measure = new Measure();
-        measure.setMeterType(MeterType.COMMON);
-        measure.setTempo(120);
-        measure.setNumber(number);
-        measure.setTrack(track);
+        Measure measure = new Measure(track, MeterType.COMMON, 120, number);
         measure.setId(daoMgr.getDaoBean().getMeasureDAO().save(measure));
         track.getMeasures().add(measure);
         return measure;
     }
 
     protected Beat createBeat(Measure measure, DurationType durationType, Integer number) throws JGuitarDAOException {
-        Beat beat = new Beat(durationType);
-        beat.setNumber(number);
-        beat.setMeasure(measure);
+        Beat beat = new Beat(measure, durationType, number);
         beat.setId(daoMgr.getDaoBean().getBeatDAO().save(beat));
         measure.getBeats().add(beat);
         return beat;
@@ -67,8 +58,7 @@ public abstract class AbstractPersistRunnable implements Runnable {
         if (wrap) {
             value -= 12;
         }
-        Note note = new Note(string, value);
-        note.setBeat(beat);
+        Note note = new Note(beat, string, value, 200);
         note.setId(daoMgr.getDaoBean().getNoteDAO().save(note));
         beat.getNotes().add(note);
     }

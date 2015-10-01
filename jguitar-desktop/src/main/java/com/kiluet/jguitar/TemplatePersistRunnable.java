@@ -1,6 +1,14 @@
 package com.kiluet.jguitar;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -29,21 +37,21 @@ public class TemplatePersistRunnable extends AbstractPersistRunnable {
     @Override
     public void run() {
         logger.info("ENTERING run()");
-        writeTemplate();
+        Song song = writeTemplate();
 
-        // try {
-        // JAXBContext context = JAXBContext.newInstance(Song.class);
-        // Marshaller m = context.createMarshaller();
-        // m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        // FileWriter fw = new FileWriter(new File("/tmp", "template.xml"));
-        // m.marshal(template, fw);
-        // } catch (IOException e1) {
-        // e1.printStackTrace();
-        // } catch (PropertyException e1) {
-        // e1.printStackTrace();
-        // } catch (JAXBException e1) {
-        // e1.printStackTrace();
-        // }
+        try {
+            JAXBContext context = JAXBContext.newInstance(Song.class);
+            Marshaller m = context.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            FileWriter fw = new FileWriter(new File("/tmp", "template.xml"));
+            m.marshal(song, fw);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        } catch (PropertyException e1) {
+            e1.printStackTrace();
+        } catch (JAXBException e1) {
+            e1.printStackTrace();
+        }
     }
 
     private Song writeTemplate() {
@@ -62,9 +70,8 @@ public class TemplatePersistRunnable extends AbstractPersistRunnable {
             song.setComments("Template");
             song.setId(daoMgr.getDaoBean().getSongDAO().save(song));
 
-            List<Instrument> instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Guitar");
-
-            Track track = createTrack(song, 1, instrumentList.get(0));
+            Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
+            Track track = createTrack(song, 1, instrument);
 
             Measure measure = createMeasure(track, 1);
             Beat beat = createBeat(measure, DurationType.HALF, 1);
@@ -104,9 +111,8 @@ public class TemplatePersistRunnable extends AbstractPersistRunnable {
             createNote(beat, 5, 2);
             createNote(beat, 6, 3);
 
-            instrumentList = daoMgr.getDaoBean().getInstrumentDAO().findByName("Electric Bass");
-
-            track = createTrack(song, 2, instrumentList.get(0));
+            instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(34);
+            track = createTrack(song, 2, instrument);
 
             measure = createMeasure(track, 1);
             beat = createBeat(measure, DurationType.HALF, 1);
@@ -140,6 +146,11 @@ public class TemplatePersistRunnable extends AbstractPersistRunnable {
             e.printStackTrace();
         }
         return song;
+    }
+
+    public static void main(String[] args) {
+        TemplatePersistRunnable runnable = new TemplatePersistRunnable();
+        runnable.run();
     }
 
 }

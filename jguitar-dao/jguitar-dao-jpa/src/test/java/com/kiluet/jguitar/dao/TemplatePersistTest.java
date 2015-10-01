@@ -136,9 +136,7 @@ public class TemplatePersistTest {
     }
 
     protected Beat createBeat(Measure measure, DurationType durationType, Integer number) throws JGuitarDAOException {
-        Beat beat = new Beat(durationType);
-        beat.setNumber(number);
-        beat.setMeasure(measure);
+        Beat beat = new Beat(measure, durationType, number);
         beat.setId(daoMgr.getDaoBean().getBeatDAO().save(beat));
         measure.getBeats().add(beat);
         return beat;
@@ -152,8 +150,7 @@ public class TemplatePersistTest {
         if (wrap) {
             value -= 12;
         }
-        Note note = new Note(string, value);
-        note.setBeat(beat);
+        Note note = new Note(beat, string, value, 200);
         note.setId(daoMgr.getDaoBean().getNoteDAO().save(note));
         beat.getNotes().add(note);
     }

@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,7 +28,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "track")
 @Entity
 @Table(schema = "jguitar", name = "track")
-@NamedQueries({ @NamedQuery(name = "Track.findBySongId", query = "SELECT a FROM Track a where a.song.id = :songId order by a.number") })
+@NamedQueries({
+        @NamedQuery(name = "Track.findBySongId", query = "SELECT a FROM Track a where a.song.id = :songId order by a.number") })
 public class Track extends PersistantEntity {
 
     private static final long serialVersionUID = -705819738289324321L;
@@ -58,7 +60,8 @@ public class Track extends PersistantEntity {
 
     @XmlElementWrapper(name = "measures")
     @XmlElement(name = "measure")
-    @OneToMany(mappedBy = "track", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "track", cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @OrderBy("number")
     private List<Measure> measures;
 
     @XmlTransient
@@ -68,6 +71,13 @@ public class Track extends PersistantEntity {
 
     public Track() {
         super();
+    }
+
+    public Track(Song song, Instrument instrument, Integer number) {
+        super();
+        this.song = song;
+        this.instrument = instrument;
+        this.number = number;
     }
 
     public Integer getNumber() {

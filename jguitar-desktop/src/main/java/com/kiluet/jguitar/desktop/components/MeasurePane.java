@@ -5,6 +5,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kiluet.jguitar.dao.JGuitarDAOException;
+import com.kiluet.jguitar.dao.JGuitarDAOManager;
 import com.kiluet.jguitar.dao.model.Beat;
 import com.kiluet.jguitar.dao.model.InstrumentString;
 import com.kiluet.jguitar.dao.model.Measure;
@@ -22,6 +24,8 @@ import javafx.scene.shape.Line;
 public class MeasurePane extends GridPane {
 
     private static final Logger logger = LoggerFactory.getLogger(MeasurePane.class);
+
+    private static final JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
 
     private Measure measure;
 
@@ -56,7 +60,26 @@ public class MeasurePane extends GridPane {
                 Line line = new Line(0, instrumentString.getString() * 10, 40, instrumentString.getString() * 10);
                 line.setStroke(Color.LIGHTGRAY);
 
-                NoteTextField noteTextField = new NoteTextField();
+                Note note = null;
+                for (Note n : beat.getNotes()) {
+                    if (n.getString().equals(instrumentString.getString())) {
+                        note = n;
+                        break;
+                    }
+                }
+
+                if (note == null) {
+                    try {
+                        Note newNote = new Note(beat, instrumentString.getString(), null, 200);
+                        newNote.setId(daoMgr.getDaoBean().getNoteDAO().save(newNote));
+                        beat.getNotes().add(newNote);
+                        note = newNote;
+                    } catch (JGuitarDAOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+                NoteTextField noteTextField = new NoteTextField(note);
                 noteTextField.setId(String.format("NoteTextField_%d_%d_%d_%d", measure.getTrack().getId(),
                         measure.getNumber(), beat.getNumber(), instrumentString.getString()));
                 noteTextField.focusedProperty().addListener(e -> {
@@ -83,15 +106,6 @@ public class MeasurePane extends GridPane {
                         case SIXTY_FOURTH:
                             jguitarController.getSixtyFouthDurationButton().setSelected(true);
                             break;
-                    }
-                });
-
-                noteTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue.startsWith("0") && newValue.length() == 2) {
-                        newValue = newValue.replaceFirst("0", "");
-                    }
-                    if (newValue.length() > 2) {
-                        newValue = oldValue;
                     }
                 });
 
@@ -156,21 +170,18 @@ public class MeasurePane extends GridPane {
 
                 stackPane.getChildren().addAll(line, noteTextField);
 
-                for (Note note : beat.getNotes()) {
-
-                    if (note.getString() == instrumentString.getString()) {
-                        noteTextField = (NoteTextField) stackPane.getChildren().get(1);
+                if (note.getString() == instrumentString.getString()) {
+                    noteTextField = (NoteTextField) stackPane.getChildren().get(1);
+                    if (note.getValue() != null) {
                         noteTextField.setText(note.getValue().toString());
                         if (beat.getNumber() == 1 && measure.getNumber() == 1
                                 && beat.getMeasure().getTrack().getNumber() == 1) {
                             Platform.runLater(() -> stackPane.getChildren().get(1).requestFocus());
                         }
                     }
-
                 }
 
                 add(stackPane, beat.getNumber(), instrumentString.getString());
-                // GridPane.setMargin(stackPane, new Insets(9, 0, 9, 0));
 
             }
 

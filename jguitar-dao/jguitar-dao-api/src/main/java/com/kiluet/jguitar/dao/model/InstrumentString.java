@@ -38,11 +38,11 @@ public class InstrumentString extends PersistantEntity {
         super();
     }
 
-    public InstrumentString(Integer string, Integer pitch, Instrument instrument) {
+    public InstrumentString(Instrument instrument, Integer string, Integer pitch) {
         super();
+        this.instrument = instrument;
         this.string = string;
         this.pitch = pitch;
-        this.instrument = instrument;
     }
 
     public Integer getString() {

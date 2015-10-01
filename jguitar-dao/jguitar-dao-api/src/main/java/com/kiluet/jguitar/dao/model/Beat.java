@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -29,7 +30,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "beat")
 @Entity
 @Table(schema = "jguitar", name = "beat")
-@NamedQueries({ @NamedQuery(name = "Beat.findByMeasureId", query = "SELECT a FROM Beat a where a.measure.id = :measureId order by a.number") })
+@NamedQueries({
+        @NamedQuery(name = "Beat.findByMeasureId", query = "SELECT a FROM Beat a where a.measure.id = :measureId order by a.number") })
 public class Beat extends PersistantEntity {
 
     private static final long serialVersionUID = -8296658472802163357L;
@@ -45,7 +47,8 @@ public class Beat extends PersistantEntity {
 
     @XmlElementWrapper(name = "notes")
     @XmlElement(name = "note")
-    @OneToMany(mappedBy = "beat", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "beat", cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @OrderBy("string")
     private List<Note> notes;
 
     @XmlTransient
@@ -57,9 +60,11 @@ public class Beat extends PersistantEntity {
         super();
     }
 
-    public Beat(DurationType duration) {
+    public Beat(Measure measure, DurationType duration, Integer number) {
         super();
+        this.measure = measure;
         this.duration = duration;
+        this.number = number;
     }
 
     public Integer getNumber() {

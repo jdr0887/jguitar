@@ -42,10 +42,17 @@ public class Note extends PersistantEntity {
         super();
     }
 
-    public Note(Integer string, Integer value) {
+    public Note(Integer string) {
         super();
         this.string = string;
+    }
+
+    public Note(Beat beat, Integer string, Integer value, Integer velocity) {
+        super();
+        this.beat = beat;
+        this.string = string;
         this.value = value;
+        this.velocity = velocity;
     }
 
     public Integer getString() {

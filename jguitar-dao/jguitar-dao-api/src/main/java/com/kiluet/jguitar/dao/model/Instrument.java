@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -27,7 +28,10 @@ import org.apache.openjpa.persistence.jdbc.Index;
 @XmlRootElement(name = "instrument")
 @Entity
 @Table(schema = "jguitar", name = "instrument", uniqueConstraints = { @UniqueConstraint(columnNames = "name") })
-@NamedQueries({ @NamedQuery(name = "Instrument.findByName", query = "SELECT a FROM Instrument a where a.name = :name") })
+@NamedQueries({
+        @NamedQuery(name = "Instrument.findByName", query = "SELECT a FROM Instrument a where a.name = :name order by a.name"),
+        @NamedQuery(name = "Instrument.findByProgram", query = "SELECT a FROM Instrument a where a.program = :program"),
+        @NamedQuery(name = "Instrument.findAll", query = "SELECT a FROM Instrument a order by a.name") })
 public class Instrument extends PersistantEntity {
 
     private static final long serialVersionUID = 860249427816538695L;
@@ -44,6 +48,7 @@ public class Instrument extends PersistantEntity {
     @XmlElementWrapper(name = "strings")
     @XmlElement(name = "string")
     @OneToMany(mappedBy = "instrument", cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @OrderBy("string")
     private List<InstrumentString> strings;
 
     public Instrument() {

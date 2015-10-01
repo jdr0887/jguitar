@@ -11,6 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -65,7 +66,8 @@ public class Song extends PersistantEntity {
 
     @XmlElementWrapper(name = "tracks")
     @XmlElement(name = "track")
-    @OneToMany(mappedBy = "song", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "song", cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @OrderBy("number")
     private List<Track> tracks;
 
     public Song() {

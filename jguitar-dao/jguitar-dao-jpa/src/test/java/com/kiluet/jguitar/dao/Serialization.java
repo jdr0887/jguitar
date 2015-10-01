@@ -18,12 +18,12 @@ public class Serialization {
     public void scratch() {
         try {
             Instrument instrument = new Instrument("Electric Guitar", 27);
-            instrument.getStrings().add(new InstrumentString(6, 40, instrument));
-            instrument.getStrings().add(new InstrumentString(5, 45, instrument));
-            instrument.getStrings().add(new InstrumentString(4, 50, instrument));
-            instrument.getStrings().add(new InstrumentString(3, 55, instrument));
-            instrument.getStrings().add(new InstrumentString(2, 59, instrument));
-            instrument.getStrings().add(new InstrumentString(1, 64, instrument));
+            instrument.getStrings().add(new InstrumentString(instrument, 6, 40));
+            instrument.getStrings().add(new InstrumentString(instrument, 5, 45));
+            instrument.getStrings().add(new InstrumentString(instrument, 4, 50));
+            instrument.getStrings().add(new InstrumentString(instrument, 3, 55));
+            instrument.getStrings().add(new InstrumentString(instrument, 2, 59));
+            instrument.getStrings().add(new InstrumentString(instrument, 1, 64));
             daoMgr.getDaoBean().getInstrumentDAO().save(instrument);
         } catch (JGuitarDAOException e) {
             e.printStackTrace();

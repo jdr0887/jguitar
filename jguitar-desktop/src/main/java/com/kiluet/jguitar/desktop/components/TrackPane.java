@@ -43,7 +43,7 @@ public class TrackPane extends GridPane {
 
         for (Measure measure : track.getMeasures()) {
 
-            logger.info(measure.toString());
+            logger.debug(measure.toString());
 
             if (measure.getNumber() == 1 && measure.getTrack().getNumber() == 1) {
                 TempoSymbol tempoSymbol = new TempoSymbol(measure.getTempo());

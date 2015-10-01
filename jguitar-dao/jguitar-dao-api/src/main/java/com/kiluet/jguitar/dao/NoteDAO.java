@@ -8,4 +8,6 @@ public interface NoteDAO extends BaseDAO<Note, Long> {
 
     public abstract List<Note> findByBeatId(Long beatId) throws JGuitarDAOException;
 
+    public abstract Note findByBeatIdAndString(Long beatId, Integer string) throws JGuitarDAOException;
+
 }

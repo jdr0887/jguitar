@@ -1,28 +1,42 @@
 package com.kiluet.jguitar.desktop.components;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.kiluet.jguitar.dao.JGuitarDAOManager;
+import com.kiluet.jguitar.dao.model.Note;
+
 import javafx.scene.control.TextField;
 
 public class NoteTextField extends TextField {
 
-    public NoteTextField() {
+    private static final JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
+
+    public NoteTextField(Note note) {
         super();
+        setId(String.format("NoteTextField_%d_%d_%d_%d", note.getBeat().getMeasure().getTrack().getId(),
+                note.getBeat().getMeasure().getNumber(), note.getBeat().getNumber(), note.getString()));
         setMaxWidth(18);
+
+        textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.startsWith("0") && newValue.length() == 2) {
+                newValue = newValue.replaceFirst("0", "");
+            }
+            if (newValue.length() > 2) {
+                newValue = oldValue;
+            }
+            try {
+                if (StringUtils.isNotEmpty(newValue)) {
+                    note.setValue(Integer.valueOf(newValue));
+                } else {
+                    note.setValue(null);
+                }
+                daoMgr.getDaoBean().getNoteDAO().save(note);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        });
+
         colorBlack();
-        // this.textProperty().addListener(new ChangeListener<String>() {
-        //
-        // @Override
-        // public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        // if (newValue.startsWith("0") && newValue.length() == 2) {
-        // setText(newValue.replaceFirst("0", ""));
-        // }
-        // if (newValue.length() > 2) {
-        // setText(oldValue);
-        // }
-        //
-        //
-        // }
-        //
-        // });
     }
 
     public void colorRed() {

@@ -20,12 +20,12 @@ public class InstrumentPersistTest {
             return;
         }
         Instrument instrument = new Instrument(instrumentName, 27);
-        instrument.getStrings().add(new InstrumentString(6, 40, instrument));
-        instrument.getStrings().add(new InstrumentString(5, 45, instrument));
-        instrument.getStrings().add(new InstrumentString(4, 50, instrument));
-        instrument.getStrings().add(new InstrumentString(3, 55, instrument));
-        instrument.getStrings().add(new InstrumentString(2, 59, instrument));
-        instrument.getStrings().add(new InstrumentString(1, 64, instrument));
+        instrument.getStrings().add(new InstrumentString(instrument, 6, 40));
+        instrument.getStrings().add(new InstrumentString(instrument, 5, 45));
+        instrument.getStrings().add(new InstrumentString(instrument, 4, 50));
+        instrument.getStrings().add(new InstrumentString(instrument, 3, 55));
+        instrument.getStrings().add(new InstrumentString(instrument, 2, 59));
+        instrument.getStrings().add(new InstrumentString(instrument, 1, 64));
         daoMgr.getDaoBean().getInstrumentDAO().save(instrument);
     }
 
@@ -37,10 +37,10 @@ public class InstrumentPersistTest {
             return;
         }
         Instrument instrument = new Instrument(instrumentName, 34);
-        instrument.getStrings().add(new InstrumentString(4, 28, instrument));
-        instrument.getStrings().add(new InstrumentString(3, 33, instrument));
-        instrument.getStrings().add(new InstrumentString(2, 38, instrument));
-        instrument.getStrings().add(new InstrumentString(1, 43, instrument));
+        instrument.getStrings().add(new InstrumentString(instrument, 4, 28));
+        instrument.getStrings().add(new InstrumentString(instrument, 3, 33));
+        instrument.getStrings().add(new InstrumentString(instrument, 2, 38));
+        instrument.getStrings().add(new InstrumentString(instrument, 1, 43));
         daoMgr.getDaoBean().getInstrumentDAO().save(instrument);
     }
 
@@ -52,10 +52,10 @@ public class InstrumentPersistTest {
             return;
         }
         Instrument instrument = new Instrument(instrumentName, 42);
-        instrument.getStrings().add(new InstrumentString(4, 36, instrument));
-        instrument.getStrings().add(new InstrumentString(3, 43, instrument));
-        instrument.getStrings().add(new InstrumentString(2, 50, instrument));
-        instrument.getStrings().add(new InstrumentString(1, 57, instrument));
+        instrument.getStrings().add(new InstrumentString(instrument, 4, 36));
+        instrument.getStrings().add(new InstrumentString(instrument, 3, 43));
+        instrument.getStrings().add(new InstrumentString(instrument, 2, 50));
+        instrument.getStrings().add(new InstrumentString(instrument, 1, 57));
         daoMgr.getDaoBean().getInstrumentDAO().save(instrument);
     }
 
@@ -67,10 +67,10 @@ public class InstrumentPersistTest {
             return;
         }
         Instrument instrument = new Instrument(instrumentName, 40);
-        instrument.getStrings().add(new InstrumentString(4, 55, instrument));
-        instrument.getStrings().add(new InstrumentString(3, 62, instrument));
-        instrument.getStrings().add(new InstrumentString(2, 69, instrument));
-        instrument.getStrings().add(new InstrumentString(1, 76, instrument));
+        instrument.getStrings().add(new InstrumentString(instrument, 4, 55));
+        instrument.getStrings().add(new InstrumentString(instrument, 3, 62));
+        instrument.getStrings().add(new InstrumentString(instrument, 2, 69));
+        instrument.getStrings().add(new InstrumentString(instrument, 1, 76));
         daoMgr.getDaoBean().getInstrumentDAO().save(instrument);
     }
 

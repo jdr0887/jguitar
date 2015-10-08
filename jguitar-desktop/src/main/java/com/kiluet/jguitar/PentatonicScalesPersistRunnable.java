@@ -260,7 +260,7 @@ public class PentatonicScalesPersistRunnable extends AbstractPersistRunnable {
                 return;
             }
             logger.info("Creating...{}", scale.toString());
-            
+
             Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
             Track track = createTrack(1, instrument);
             scale.setTrack(track);

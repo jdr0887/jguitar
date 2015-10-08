@@ -94,13 +94,13 @@
             </value>
           </ComboBox>
           <Separator />
-          <ToggleButton text="1" fx:id="wholeDurationButton" toggleGroup="$beatDurationTypeGroup" />
-          <ToggleButton text="1/2" fx:id="halfDurationButton" toggleGroup="$beatDurationTypeGroup" />
-          <ToggleButton text="1/4" fx:id="quarterDurationButton" toggleGroup="$beatDurationTypeGroup" />
-          <ToggleButton text="1/8" fx:id="eighthDurationButton" toggleGroup="$beatDurationTypeGroup" />
-          <ToggleButton text="1/16" fx:id="sixteenthDurationButton" toggleGroup="$beatDurationTypeGroup" />
-          <ToggleButton text="1/32" fx:id="thritySecondDurationButton" toggleGroup="$beatDurationTypeGroup" />
-          <ToggleButton text="1/64" fx:id="sixtyFouthDurationButton" toggleGroup="$beatDurationTypeGroup" />
+          <ToggleButton text="1" fx:id="wholeDurationButton" toggleGroup="$beatDurationTypeGroup" onAction="#wholeNoteDurationAction" />
+          <ToggleButton text="1/2" fx:id="halfDurationButton" toggleGroup="$beatDurationTypeGroup" onAction="#halfNoteDurationAction" />
+          <ToggleButton text="1/4" fx:id="quarterDurationButton" toggleGroup="$beatDurationTypeGroup" onAction="#quarterNoteDurationAction" />
+          <ToggleButton text="1/8" fx:id="eighthDurationButton" toggleGroup="$beatDurationTypeGroup" onAction="#eighthNoteDurationAction" />
+          <ToggleButton text="1/16" fx:id="sixteenthDurationButton" toggleGroup="$beatDurationTypeGroup" onAction="#sixteenthNoteDurationAction" />
+          <ToggleButton text="1/32" fx:id="thirtySecondDurationButton" toggleGroup="$beatDurationTypeGroup" onAction="#thirtySecondNoteDurationAction" />
+          <ToggleButton text="1/64" fx:id="sixtyFourthDurationButton" toggleGroup="$beatDurationTypeGroup" onAction="#sixtyFourthNoteDurationAction" />
           <Separator />
           <Button text="||:" onAction="#toggleOpenRepeat" />
           <Button text=":||" onAction="#toggleCloseRepeat" />

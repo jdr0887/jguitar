@@ -1,14 +1,6 @@
 package com.kiluet.jguitar;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -39,19 +31,19 @@ public class TemplatePersistRunnable extends AbstractPersistRunnable {
         logger.info("ENTERING run()");
         Song song = writeTemplate();
 
-        try {
-            JAXBContext context = JAXBContext.newInstance(Song.class);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            FileWriter fw = new FileWriter(new File("/tmp", "template.xml"));
-            m.marshal(song, fw);
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        } catch (PropertyException e1) {
-            e1.printStackTrace();
-        } catch (JAXBException e1) {
-            e1.printStackTrace();
-        }
+        // try {
+        // JAXBContext context = JAXBContext.newInstance(Song.class);
+        // Marshaller m = context.createMarshaller();
+        // m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        // FileWriter fw = new FileWriter(new File("/tmp", "template.xml"));
+        // m.marshal(song, fw);
+        // } catch (IOException e1) {
+        // e1.printStackTrace();
+        // } catch (PropertyException e1) {
+        // e1.printStackTrace();
+        // } catch (JAXBException e1) {
+        // e1.printStackTrace();
+        // }
     }
 
     private Song writeTemplate() {

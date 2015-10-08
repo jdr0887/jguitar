@@ -79,11 +79,12 @@ public class MeasurePane extends GridPane {
                     }
                 }
 
+                final Note finalNote = note;
                 NoteTextField noteTextField = new NoteTextField(note);
                 noteTextField.setId(String.format("NoteTextField_%d_%d_%d_%d", measure.getTrack().getId(),
                         measure.getNumber(), beat.getNumber(), instrumentString.getString()));
                 noteTextField.focusedProperty().addListener(e -> {
-                    jguitarController.setMeasureIndex(measure.getNumber());
+                    jguitarController.setSelectedNote(finalNote);
                     switch (beat.getDuration()) {
                         case WHOLE:
                             jguitarController.getWholeDurationButton().setSelected(true);
@@ -101,10 +102,10 @@ public class MeasurePane extends GridPane {
                             jguitarController.getSixteenthDurationButton().setSelected(true);
                             break;
                         case THIRTY_SECOND:
-                            jguitarController.getThritySecondDurationButton().setSelected(true);
+                            jguitarController.getThirtySecondDurationButton().setSelected(true);
                             break;
                         case SIXTY_FOURTH:
-                            jguitarController.getSixtyFouthDurationButton().setSelected(true);
+                            jguitarController.getSixtyFourthDurationButton().setSelected(true);
                             break;
                     }
                 });
@@ -214,14 +215,14 @@ public class MeasurePane extends GridPane {
                     GridPane.setHalignment(sixteenthNoteSymbol, HPos.CENTER);
                     break;
                 case THIRTY_SECOND:
-                    jguitarController.getThritySecondDurationButton().setSelected(true);
+                    jguitarController.getThirtySecondDurationButton().setSelected(true);
                     ThirtySecondNoteSymbol thirtySecondNoteSymbol = new ThirtySecondNoteSymbol();
                     add(thirtySecondNoteSymbol, beat.getNumber(), instrumentStrings.size() + 1);
                     GridPane.setMargin(thirtySecondNoteSymbol, new Insets(10, 0, 0, 0));
                     GridPane.setHalignment(thirtySecondNoteSymbol, HPos.CENTER);
                     break;
                 case SIXTY_FOURTH:
-                    jguitarController.getSixtyFouthDurationButton().setSelected(true);
+                    jguitarController.getSixtyFourthDurationButton().setSelected(true);
                     SixtyFourthNoteSymbol sixtyFourthNoteSymbol = new SixtyFourthNoteSymbol();
                     add(sixtyFourthNoteSymbol, beat.getNumber(), instrumentStrings.size() + 1);
                     GridPane.setMargin(sixtyFourthNoteSymbol, new Insets(10, 0, 0, 0));

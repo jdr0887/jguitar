@@ -24,7 +24,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -52,6 +52,7 @@ import com.kiluet.jguitar.desktop.components.ScalePane;
 import com.kiluet.jguitar.desktop.components.SongPane;
 import com.kiluet.jguitar.desktop.components.TrackPane;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -74,6 +75,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
@@ -128,7 +130,7 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     @FXML
     private ToggleButton wholeDurationButton, halfDurationButton, quarterDurationButton, eighthDurationButton,
-            sixteenthDurationButton, thritySecondDurationButton, sixtyFouthDurationButton;
+            sixteenthDurationButton, thirtySecondDurationButton, sixtyFourthDurationButton;
 
     @FXML
     private Button playButton;
@@ -142,7 +144,7 @@ public class JGuitarController extends BorderPane implements Initializable {
 
     private Iterator<List<Beat>> beatIter;
 
-    private Integer measureIndex;
+    private Note selectedNote;
 
     private Synthesizer synthesizer;
 
@@ -210,6 +212,14 @@ public class JGuitarController extends BorderPane implements Initializable {
             e.printStackTrace();
         }
 
+        wholeDurationButton.setUserData(DurationType.WHOLE);
+        halfDurationButton.setUserData(DurationType.HALF);
+        quarterDurationButton.setUserData(DurationType.QUARTER);
+        eighthDurationButton.setUserData(DurationType.EIGHTH);
+        sixteenthDurationButton.setUserData(DurationType.SIXTEENTH);
+        thirtySecondDurationButton.setUserData(DurationType.THIRTY_SECOND);
+        sixtyFourthDurationButton.setUserData(DurationType.SIXTY_FOURTH);
+
     }
 
     @FXML
@@ -220,6 +230,193 @@ public class JGuitarController extends BorderPane implements Initializable {
     @FXML
     private void doNew(final ActionEvent event) {
         // app.doNew();
+    }
+
+    @FXML
+    private void wholeNoteDurationAction(final ActionEvent event) {
+        Platform.runLater(() -> {
+            if (durationToggle(DurationType.WHOLE)) {
+                wholeDurationButton.setSelected(true);
+            } else {
+                Beat selectedBeat = selectedNote.getBeat();
+                Toggle previousToggle = null;
+                for (Toggle toggle : beatDurationTypeGroup.getToggles()) {
+                    if (toggle.getUserData().equals(selectedBeat.getDuration())) {
+                        previousToggle = toggle;
+                        break;
+                    }
+                }
+                previousToggle.setSelected(true);
+            }
+        });
+    }
+
+    @FXML
+    private void halfNoteDurationAction(final ActionEvent event) {
+        Platform.runLater(() -> {
+            if (durationToggle(DurationType.HALF)) {
+                halfDurationButton.setSelected(true);
+            } else {
+                Beat selectedBeat = selectedNote.getBeat();
+                Toggle previousToggle = null;
+                for (Toggle toggle : beatDurationTypeGroup.getToggles()) {
+                    if (toggle.getUserData().equals(selectedBeat.getDuration())) {
+                        previousToggle = toggle;
+                        break;
+                    }
+                }
+                previousToggle.setSelected(true);
+            }
+        });
+    }
+
+    @FXML
+    private void quarterNoteDurationAction(final ActionEvent event) {
+        Platform.runLater(() -> {
+            if (durationToggle(DurationType.QUARTER)) {
+                quarterDurationButton.setSelected(true);
+            } else {
+                Beat selectedBeat = selectedNote.getBeat();
+                Toggle previousToggle = null;
+                for (Toggle toggle : beatDurationTypeGroup.getToggles()) {
+                    if (toggle.getUserData().equals(selectedBeat.getDuration())) {
+                        previousToggle = toggle;
+                        break;
+                    }
+                }
+                previousToggle.setSelected(true);
+            }
+        });
+    }
+
+    @FXML
+    private void eighthNoteDurationAction(final ActionEvent event) {
+        Platform.runLater(() -> {
+            if (durationToggle(DurationType.EIGHTH)) {
+                eighthDurationButton.setSelected(true);
+            } else {
+                Beat selectedBeat = selectedNote.getBeat();
+                Toggle previousToggle = null;
+                for (Toggle toggle : beatDurationTypeGroup.getToggles()) {
+                    if (toggle.getUserData().equals(selectedBeat.getDuration())) {
+                        previousToggle = toggle;
+                        break;
+                    }
+                }
+                previousToggle.setSelected(true);
+            }
+        });
+    }
+
+    @FXML
+    private void sixteenthNoteDurationAction(final ActionEvent event) {
+        Platform.runLater(() -> {
+            if (durationToggle(DurationType.SIXTEENTH)) {
+                sixteenthDurationButton.setSelected(true);
+            } else {
+                Beat selectedBeat = selectedNote.getBeat();
+                Toggle previousToggle = null;
+                for (Toggle toggle : beatDurationTypeGroup.getToggles()) {
+                    if (toggle.getUserData().equals(selectedBeat.getDuration())) {
+                        previousToggle = toggle;
+                        break;
+                    }
+                }
+                previousToggle.setSelected(true);
+            }
+        });
+    }
+
+    @FXML
+    private void thirtySecondNoteDurationAction(final ActionEvent event) {
+        Platform.runLater(() -> {
+            if (durationToggle(DurationType.THIRTY_SECOND)) {
+                thirtySecondDurationButton.setSelected(true);
+            } else {
+                Beat selectedBeat = selectedNote.getBeat();
+                Toggle previousToggle = null;
+                for (Toggle toggle : beatDurationTypeGroup.getToggles()) {
+                    if (toggle.getUserData().equals(selectedBeat.getDuration())) {
+                        previousToggle = toggle;
+                        break;
+                    }
+                }
+                previousToggle.setSelected(true);
+            }
+        });
+    }
+
+    @FXML
+    private void sixtyFourthNoteDurationAction(final ActionEvent event) {
+        Platform.runLater(() -> {
+            if (durationToggle(DurationType.SIXTY_FOURTH)) {
+                sixtyFourthDurationButton.setSelected(true);
+            } else {
+                Beat selectedBeat = selectedNote.getBeat();
+                Toggle previousToggle = null;
+                for (Toggle toggle : beatDurationTypeGroup.getToggles()) {
+                    if (toggle.getUserData().equals(selectedBeat.getDuration())) {
+                        previousToggle = toggle;
+                        break;
+                    }
+                }
+                previousToggle.setSelected(true);
+            }
+        });
+    }
+
+    private Boolean durationToggle(DurationType durationType) {
+
+        // DurationType durationType = (DurationType) beatDurationTypeGroup.getSelectedToggle().getUserData();
+        if (selectedNote != null) {
+
+            Beat selectedBeat = selectedNote.getBeat();
+
+            Measure selectedMeasure = selectedBeat.getMeasure();
+
+            List<Beat> proximalBeats = new ArrayList<Beat>();
+            selectedMeasure.getBeats().forEach(beat -> {
+                if (!beat.equals(selectedBeat)
+                        && beat.getNumber() < selectedBeat.getNumber() + selectedBeat.getDuration().getCode() / 2) {
+                    proximalBeats.add(beat);
+                }
+            });
+
+            if (CollectionUtils.isNotEmpty(proximalBeats)) {
+                Iterator<Beat> beatIter = selectedMeasure.getBeats().iterator();
+                while (beatIter.hasNext()) {
+                    Beat beat = beatIter.next();
+                    if (proximalBeats.contains(beat)) {
+                        try {
+                            beatIter.remove();
+                            daoMgr.getDaoBean().getBeatDAO().delete(beat);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            if (selectedNote.getBeat().getDuration().getCode() < durationType.getCode()) {
+                if (CollectionUtils.isEmpty(proximalBeats)) {
+                    expandBeats(proximalBeats, durationType);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            if (selectedNote.getBeat().getDuration().getCode() > durationType.getCode()) {
+                if (CollectionUtils.isNotEmpty(proximalBeats)) {
+                    collapseBeats(proximalBeats, durationType);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+        }
+        return false;
     }
 
     @FXML
@@ -240,6 +437,7 @@ public class JGuitarController extends BorderPane implements Initializable {
             return;
         }
         Integer measureIndex = Integer.valueOf(v);
+
         for (Track track : song.getTracks()) {
             Measure newMeasure = null;
             for (Measure measure : track.getMeasures()) {
@@ -381,7 +579,7 @@ public class JGuitarController extends BorderPane implements Initializable {
         for (Track track : this.song.getTracks()) {
             Measure measure = null;
             for (Measure m : track.getMeasures()) {
-                if (m.getNumber().equals(getMeasureIndex())) {
+                if (m.getNumber().equals(getSelectedNote().getBeat().getMeasure().getNumber())) {
                     measure = m;
                     break;
                 }
@@ -398,19 +596,139 @@ public class JGuitarController extends BorderPane implements Initializable {
                 e.printStackTrace();
             }
 
-            Node trackPaneNode = this.songPane.lookup(String.format("#TrackPane_%d", measure.getTrack().getId()));
-            Node measurePaneNode = trackPaneNode.lookup(String.format("#MeasurePane_%d", measure.getId()));
+            refreshMeasure(measure);
+        }
 
-            Node measureSeparatorNode = measurePaneNode
-                    .lookup(String.format("#MeasureOpenSeparatorPane_%d", measure.getId()));
-            if (measureSeparatorNode != null && measureSeparatorNode instanceof MeasureOpenSeparatorPane) {
-                MeasureOpenSeparatorPane measureSeparatorPane = (MeasureOpenSeparatorPane) measureSeparatorNode;
-                measureSeparatorPane.getChildren().clear();
-                measureSeparatorPane.init();
-                measureSeparatorPane.requestLayout();
+    }
+
+    private void collapseBeats(List<Beat> proximalBeats, DurationType durationType) {
+        logger.info("ENTERING collapseBeats(DurationType)");
+
+        Beat selectedBeat = selectedNote.getBeat();
+        Measure selectedMeasure = selectedBeat.getMeasure();
+
+        try {
+            selectedBeat.setDuration(durationType);
+            daoMgr.getDaoBean().getBeatDAO().save(selectedBeat);
+        } catch (JGuitarDAOException e) {
+            e.printStackTrace();
+        }
+
+        List<Beat> newBeats = new ArrayList<Beat>();
+        for (int i = 0; i < (durationType.getCode() / 2) - 1; i++) {
+            try {
+                Beat newBeat = new Beat(selectedMeasure, durationType, selectedBeat.getNumber() + i + 1);
+                newBeat.setId(daoMgr.getDaoBean().getBeatDAO().save(newBeat));
+                selectedMeasure.getTrack().getInstrument().getStrings().forEach(string -> {
+                    try {
+                        Note newNote = new Note(newBeat, string.getString(), null, 200);
+                        newNote.setId(daoMgr.getDaoBean().getNoteDAO().save(newNote));
+                        newBeat.getNotes().add(newNote);
+                    } catch (JGuitarDAOException e) {
+                        e.printStackTrace();
+                    }
+                });
+                newBeats.add(newBeat);
+            } catch (JGuitarDAOException e) {
+                e.printStackTrace();
+            }
+        }
+        // newBeats.forEach(a -> logger.info(a.toString()));
+
+        List<Beat> beatsToDecrement = new ArrayList<Beat>();
+        selectedMeasure.getBeats().forEach(a -> {
+            if (a.getNumber() > selectedBeat.getNumber() + durationType.getCode() - 1) {
+                beatsToDecrement.add(a);
+            }
+        });
+
+        beatsToDecrement.forEach(a -> {
+            for (int i = 0; i < newBeats.size() + proximalBeats.size(); i++) {
+                try {
+                    a.decrementNumber();
+                    daoMgr.getDaoBean().getBeatDAO().save(a);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        selectedMeasure.getBeats().addAll(newBeats);
+
+        selectedMeasure.getBeats().sort((a, b) -> a.getNumber().compareTo(b.getNumber()));
+        selectedMeasure.getBeats().forEach(a -> logger.info(a.toString()));
+
+        refreshMeasure(selectedMeasure);
+
+    }
+
+    private void expandBeats(List<Beat> proximalBeats, DurationType durationType) {
+        logger.info("ENTERING expandBeats(DurationType)");
+        Beat selectedBeat = selectedNote.getBeat();
+        Measure selectedMeasure = selectedBeat.getMeasure();
+
+        try {
+            selectedBeat.setDuration(durationType);
+            daoMgr.getDaoBean().getBeatDAO().save(selectedBeat);
+        } catch (JGuitarDAOException e) {
+            e.printStackTrace();
+        }
+
+        List<Beat> newBeats = new ArrayList<Beat>();
+        for (int i = 0; i < (durationType.getCode() / 2) - 1; i++) {
+            try {
+                Beat newBeat = new Beat(selectedMeasure, durationType, selectedBeat.getNumber() + i + 1);
+                newBeat.setId(daoMgr.getDaoBean().getBeatDAO().save(newBeat));
+                selectedMeasure.getTrack().getInstrument().getStrings().forEach(string -> {
+                    try {
+                        Note newNote = new Note(newBeat, string.getString(), null, 200);
+                        newNote.setId(daoMgr.getDaoBean().getNoteDAO().save(newNote));
+                        newBeat.getNotes().add(newNote);
+                    } catch (JGuitarDAOException e) {
+                        e.printStackTrace();
+                    }
+                });
+                newBeats.add(newBeat);
+            } catch (JGuitarDAOException e) {
+                e.printStackTrace();
             }
         }
 
+        // newBeats.forEach(a -> logger.info(a.toString()));
+
+        List<Beat> beatsToIncrement = new ArrayList<Beat>();
+        selectedMeasure.getBeats().forEach(a -> {
+            if (a.getNumber() > selectedBeat.getNumber()) {
+                beatsToIncrement.add(a);
+            }
+        });
+
+        beatsToIncrement.forEach(a -> {
+            for (int i = 0; i < newBeats.size() - proximalBeats.size(); i++) {
+                try {
+                    a.incrementNumber();
+                    daoMgr.getDaoBean().getBeatDAO().save(a);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        selectedMeasure.getBeats().addAll(newBeats);
+
+        selectedMeasure.getBeats().sort((a, b) -> a.getNumber().compareTo(b.getNumber()));
+        selectedMeasure.getBeats().forEach(a -> logger.info(a.toString()));
+
+        refreshMeasure(selectedMeasure);
+    }
+
+    public void refreshMeasure(Measure measure) {
+        Node trackPaneNode = this.songPane.lookup(String.format("#TrackPane_%d", measure.getTrack().getId()));
+        Node measurePaneNode = trackPaneNode.lookup(String.format("#MeasurePane_%d", measure.getId()));
+        if (measurePaneNode != null && measurePaneNode instanceof MeasurePane) {
+            MeasurePane measurePane = (MeasurePane) measurePaneNode;
+            measurePane.getChildren().clear();
+            measurePane.init();
+            measurePane.requestLayout();
+        }
     }
 
     @FXML
@@ -425,7 +743,7 @@ public class JGuitarController extends BorderPane implements Initializable {
         List<Measure> measuresAccrossTracks = new ArrayList<Measure>();
         for (Track track : this.song.getTracks()) {
             for (Measure m : track.getMeasures()) {
-                if (m.getNumber().equals(this.getMeasureIndex())) {
+                if (m.getNumber().equals(getSelectedNote().getBeat().getMeasure().getNumber())) {
                     measuresAccrossTracks.add(m);
                     break;
                 }
@@ -708,10 +1026,10 @@ public class JGuitarController extends BorderPane implements Initializable {
         this.beatIter = beatMap.values().iterator();
 
         this.es = Executors.newSingleThreadScheduledExecutor();
-
-        logger.info("measureIndex = {}", measureIndex);
-        if (measureIndex != null) {
-            for (int i = 0; i < measureIndex - 1; i++) {
+        Integer selectedMeasureIndex = selectedNote.getBeat().getMeasure().getNumber();
+        logger.info("selectedMeasureIndex = {}", selectedMeasureIndex);
+        if (selectedMeasureIndex != null) {
+            for (int i = 0; i < selectedMeasureIndex - 1; i++) {
                 previousBeats = currentBeats;
                 currentBeats = beatIter.next();
             }
@@ -1026,20 +1344,20 @@ public class JGuitarController extends BorderPane implements Initializable {
         this.sixteenthDurationButton = sixteenthDurationButton;
     }
 
-    public ToggleButton getThritySecondDurationButton() {
-        return thritySecondDurationButton;
+    public ToggleButton getThirtySecondDurationButton() {
+        return thirtySecondDurationButton;
     }
 
-    public void setThritySecondDurationButton(ToggleButton thritySecondDurationButton) {
-        this.thritySecondDurationButton = thritySecondDurationButton;
+    public void setThirtySecondDurationButton(ToggleButton thirtySecondDurationButton) {
+        this.thirtySecondDurationButton = thirtySecondDurationButton;
     }
 
-    public ToggleButton getSixtyFouthDurationButton() {
-        return sixtyFouthDurationButton;
+    public ToggleButton getSixtyFourthDurationButton() {
+        return sixtyFourthDurationButton;
     }
 
-    public void setSixtyFouthDurationButton(ToggleButton sixtyFouthDurationButton) {
-        this.sixtyFouthDurationButton = sixtyFouthDurationButton;
+    public void setSixtyFourthDurationButton(ToggleButton sixtyFourthDurationButton) {
+        this.sixtyFourthDurationButton = sixtyFourthDurationButton;
     }
 
     public ComboBox<String> getSpeedComboBox() {
@@ -1050,12 +1368,12 @@ public class JGuitarController extends BorderPane implements Initializable {
         this.speedComboBox = speedComboBox;
     }
 
-    public Integer getMeasureIndex() {
-        return measureIndex;
+    public Note getSelectedNote() {
+        return selectedNote;
     }
 
-    public void setMeasureIndex(Integer measureIndex) {
-        this.measureIndex = measureIndex;
+    public void setSelectedNote(Note selectedNote) {
+        this.selectedNote = selectedNote;
     }
 
     public SongPane getSongPane() {

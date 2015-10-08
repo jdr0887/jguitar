@@ -44,7 +44,7 @@ public class MeasureFooterPane extends GridPane {
                     GridPane.setMargin(quarterNoteSymbol, new Insets(10, 0, 0, 0));
                     if (measure.getNumber() == 1) {
                         GridPane.setMargin(quarterNoteSymbol, new Insets(10, 0, 0, 40));
-                    } 
+                    }
                     GridPane.setHalignment(quarterNoteSymbol, HPos.CENTER);
                     break;
                 case EIGHTH:
@@ -54,7 +54,7 @@ public class MeasureFooterPane extends GridPane {
                     GridPane.setMargin(eighthNoteSymbol, new Insets(10, 0, 0, 0));
                     if (measure.getNumber() == 1) {
                         GridPane.setMargin(eighthNoteSymbol, new Insets(10, 0, 0, 40));
-                    } 
+                    }
                     GridPane.setHalignment(eighthNoteSymbol, HPos.CENTER);
                     break;
                 case SIXTEENTH:
@@ -69,7 +69,7 @@ public class MeasureFooterPane extends GridPane {
                     GridPane.setHalignment(sixteenthNoteSymbol, HPos.CENTER);
                     break;
                 case THIRTY_SECOND:
-                    jguitarController.getThritySecondDurationButton().setSelected(true);
+                    jguitarController.getThirtySecondDurationButton().setSelected(true);
                     ThirtySecondNoteSymbol thirtySecondNoteSymbol = new ThirtySecondNoteSymbol();
                     add(thirtySecondNoteSymbol, beat.getNumber(), 0);
                     if (measure.getNumber() == 1) {
@@ -80,7 +80,7 @@ public class MeasureFooterPane extends GridPane {
                     GridPane.setHalignment(thirtySecondNoteSymbol, HPos.CENTER);
                     break;
                 case SIXTY_FOURTH:
-                    jguitarController.getSixtyFouthDurationButton().setSelected(true);
+                    jguitarController.getSixtyFourthDurationButton().setSelected(true);
                     SixtyFourthNoteSymbol sixtyFourthNoteSymbol = new SixtyFourthNoteSymbol();
                     add(sixtyFourthNoteSymbol, beat.getNumber(), 0);
                     if (measure.getNumber() == 1) {

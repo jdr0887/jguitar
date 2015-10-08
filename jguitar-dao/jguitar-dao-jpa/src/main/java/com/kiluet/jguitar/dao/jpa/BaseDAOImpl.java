@@ -29,7 +29,7 @@ public abstract class BaseDAOImpl<T extends Persistable, ID extends Serializable
     public abstract Class<T> getPersistentClass();
 
     @Override
-    public Long save(T entity) throws JGuitarDAOException {
+    public synchronized Long save(T entity) throws JGuitarDAOException {
         logger.debug("ENTERING save(T)");
         entityManager.getTransaction().begin();
         if (!entityManager.contains(entity) && entity.getId() != null) {
@@ -43,7 +43,7 @@ public abstract class BaseDAOImpl<T extends Persistable, ID extends Serializable
     }
 
     @Override
-    public void delete(T entity) throws JGuitarDAOException {
+    public synchronized void delete(T entity) throws JGuitarDAOException {
         logger.debug("ENTERING delete(T)");
         entityManager.getTransaction().begin();
         T foundEntity = entityManager.find(getPersistentClass(), entity.getId());
@@ -52,21 +52,21 @@ public abstract class BaseDAOImpl<T extends Persistable, ID extends Serializable
     }
 
     @Override
-    public void delete(List<T> entityList) throws JGuitarDAOException {
+    public synchronized void delete(List<T> entityList) throws JGuitarDAOException {
         List<Long> idList = new ArrayList<Long>();
         for (T t : entityList) {
             idList.add(t.getId());
         }
         entityManager.getTransaction().begin();
-        Query qDelete = entityManager.createQuery("delete from " + getPersistentClass().getSimpleName()
-                + " a where a.id in (?1)");
+        Query qDelete = entityManager
+                .createQuery("delete from " + getPersistentClass().getSimpleName() + " a where a.id in (?1)");
         qDelete.setParameter(1, idList);
         qDelete.executeUpdate();
         entityManager.getTransaction().commit();
     }
 
     @Override
-    public T findById(ID id) throws JGuitarDAOException {
+    public synchronized T findById(ID id) throws JGuitarDAOException {
         logger.debug("ENTERING findById(T)");
         T ret = entityManager.find(getPersistentClass(), id);
         return ret;

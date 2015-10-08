@@ -2,18 +2,32 @@ package com.kiluet.jguitar.dao.model;
 
 public enum DurationType {
 
-    WHOLE,
+    WHOLE(1),
 
-    HALF,
+    HALF(2),
 
-    QUARTER,
+    QUARTER(4),
 
-    EIGHTH,
+    EIGHTH(8),
 
-    SIXTEENTH,
+    SIXTEENTH(16),
 
-    THIRTY_SECOND,
+    THIRTY_SECOND(32),
 
-    SIXTY_FOURTH;
+    SIXTY_FOURTH(64);
+
+    private Integer code;
+
+    private DurationType(Integer code) {
+        this.code = code;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
 
 }

@@ -88,6 +88,14 @@ public class Track extends PersistantEntity {
         this.number = number;
     }
 
+    public void incrementNumber() {
+        number++;
+    }
+
+    public void decrementNumber() {
+        number--;
+    }
+
     public Integer getOffset() {
         return offset;
     }

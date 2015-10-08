@@ -21,6 +21,10 @@
       <groupId>com.kiluet.jguitar</groupId>
       <artifactId>jguitar-config</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+    </dependency>          
   </dependencies>
   <build>
     <plugins>
@@ -43,27 +47,6 @@
 		</manifest>
 	      </archive>
 	    </configuration>
-	  </execution>
-	</executions>
-      </plugin>
-      <plugin>
-	<artifactId>maven-antrun-plugin</artifactId>
-	<executions>
-	  <execution>
-	    <id>0</id>
-	    <phase>validate</phase>
-	    <configuration>
-	      <tasks>
-		<delete file="${basedir}/src/main/resources/com/kiluet/jguitar/desktop/jguitar.properties" />
-		<touch file="${basedir}/src/main/resources/com/kiluet/jguitar/desktop/jguitar.properties" mkdirs="true" />
-		<echo file="${basedir}/src/main/resources/com/kiluet/jguitar/desktop/jguitar.properties" append="true">
-version=${project.version}
-		</echo>
-	      </tasks>
-	    </configuration>
-	    <goals>
-	      <goal>run</goal>
-	    </goals>
 	  </execution>
 	</executions>
       </plugin>

@@ -45,12 +45,12 @@ public class InstrumentsPersistRunnable extends AbstractPersistRunnable {
             javax.sound.midi.Instrument[] instruments = synthesizer.getAvailableInstruments();
             for (javax.sound.midi.Instrument instrument : instruments) {
                 if (instrument.getPatch().getBank() == 0) {
+                    List<Instrument> foundInstruments = daoMgr.getDaoBean().getInstrumentDAO()
+                            .findByName(instrument.getName());
+                    if (CollectionUtils.isNotEmpty(foundInstruments)) {
+                        continue;
+                    }
                     if (instrument.getName().toLowerCase().contains("guitar")) {
-                        List<Instrument> foundInstruments = daoMgr.getDaoBean().getInstrumentDAO()
-                                .findByName(instrument.getName());
-                        if (CollectionUtils.isNotEmpty(foundInstruments)) {
-                            continue;
-                        }
                         Instrument jguitarInstrument = new Instrument(instrument.getName(),
                                 instrument.getPatch().getProgram());
                         jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 6, 40));
@@ -63,11 +63,6 @@ public class InstrumentsPersistRunnable extends AbstractPersistRunnable {
                     }
 
                     if (instrument.getName().toLowerCase().contains("bass")) {
-                        List<Instrument> foundInstruments = daoMgr.getDaoBean().getInstrumentDAO()
-                                .findByName(instrument.getName());
-                        if (CollectionUtils.isNotEmpty(foundInstruments)) {
-                            continue;
-                        }
                         Instrument jguitarInstrument = new Instrument(instrument.getName(),
                                 instrument.getPatch().getProgram());
                         jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 4, 28));
@@ -78,11 +73,6 @@ public class InstrumentsPersistRunnable extends AbstractPersistRunnable {
                     }
 
                     if (instrument.getName().equalsIgnoreCase("cello")) {
-                        List<Instrument> foundInstruments = daoMgr.getDaoBean().getInstrumentDAO()
-                                .findByName(instrument.getName());
-                        if (CollectionUtils.isNotEmpty(foundInstruments)) {
-                            continue;
-                        }
                         Instrument jguitarInstrument = new Instrument(instrument.getName(),
                                 instrument.getPatch().getProgram());
                         jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 4, 36));
@@ -93,11 +83,6 @@ public class InstrumentsPersistRunnable extends AbstractPersistRunnable {
                     }
 
                     if (instrument.getName().equalsIgnoreCase("violin")) {
-                        List<Instrument> foundInstruments = daoMgr.getDaoBean().getInstrumentDAO()
-                                .findByName(instrument.getName());
-                        if (CollectionUtils.isNotEmpty(foundInstruments)) {
-                            continue;
-                        }
                         Instrument jguitarInstrument = new Instrument(instrument.getName(),
                                 instrument.getPatch().getProgram());
                         jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 4, 55));
@@ -108,11 +93,6 @@ public class InstrumentsPersistRunnable extends AbstractPersistRunnable {
                     }
 
                     if (instrument.getName().equalsIgnoreCase("viola")) {
-                        List<Instrument> foundInstruments = daoMgr.getDaoBean().getInstrumentDAO()
-                                .findByName(instrument.getName());
-                        if (CollectionUtils.isNotEmpty(foundInstruments)) {
-                            continue;
-                        }
                         Instrument jguitarInstrument = new Instrument(instrument.getName(),
                                 instrument.getPatch().getProgram());
                         jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 4, 48));

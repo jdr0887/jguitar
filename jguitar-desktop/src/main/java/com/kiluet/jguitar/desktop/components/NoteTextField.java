@@ -11,8 +11,11 @@ public class NoteTextField extends TextField {
 
     private static final JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
 
+    private final Note note;
+
     public NoteTextField(Note note) {
         super();
+        this.note = note;
         setId(String.format("NoteTextField_%d_%d_%d_%d", note.getBeat().getMeasure().getTrack().getId(),
                 note.getBeat().getMeasure().getNumber(), note.getBeat().getNumber(), note.getString()));
         setMaxWidth(18);
@@ -61,6 +64,10 @@ public class NoteTextField extends TextField {
         if (text.matches("[0-9]*")) {
             super.replaceSelection(text);
         }
+    }
+
+    public Note getNote() {
+        return note;
     }
 
 }

@@ -75,6 +75,14 @@ public class Beat extends PersistantEntity {
         this.number = number;
     }
 
+    public void incrementNumber() {
+        number++;
+    }
+
+    public void decrementNumber() {
+        number--;
+    }
+
     public DurationType getDuration() {
         return duration;
     }
@@ -104,7 +112,7 @@ public class Beat extends PersistantEntity {
 
     @Override
     public String toString() {
-        return String.format("Beat [duration=%s, number=%s]", duration, number);
+        return String.format("Beat [id=%s, number=%s, duration=%s]", id, number, duration);
     }
 
     @Override

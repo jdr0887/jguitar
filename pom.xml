@@ -143,6 +143,11 @@
 	<version>${commons.lang.version}</version>
       </dependency>
       <dependency>
+	<groupId>org.apache.commons</groupId>
+	<artifactId>commons-collections4</artifactId>
+	<version>4.0</version>
+      </dependency>      
+      <dependency>
 	<groupId>org.apache.openjpa</groupId>
 	<artifactId>openjpa</artifactId>
 	<version>${openjpa.version}</version>

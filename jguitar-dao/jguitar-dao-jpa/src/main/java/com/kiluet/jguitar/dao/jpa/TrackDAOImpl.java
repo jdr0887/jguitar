@@ -6,11 +6,15 @@ import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.TrackDAO;
 import com.kiluet.jguitar.dao.model.Track;
 
+@Component
+@Transactional(readOnly = true)
 public class TrackDAOImpl extends BaseDAOImpl<Track, Long> implements TrackDAO {
 
     private final Logger logger = LoggerFactory.getLogger(TrackDAOImpl.class);

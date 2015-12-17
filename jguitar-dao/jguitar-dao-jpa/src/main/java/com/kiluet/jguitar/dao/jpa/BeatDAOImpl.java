@@ -12,6 +12,8 @@ import javax.persistence.criteria.Root;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kiluet.jguitar.dao.BeatDAO;
 import com.kiluet.jguitar.dao.JGuitarDAOException;
@@ -24,6 +26,8 @@ import com.kiluet.jguitar.dao.model.Song_;
 import com.kiluet.jguitar.dao.model.Track;
 import com.kiluet.jguitar.dao.model.Track_;
 
+@Component
+@Transactional(readOnly = true)
 public class BeatDAOImpl extends BaseDAOImpl<Beat, Long>implements BeatDAO {
 
     private final Logger logger = LoggerFactory.getLogger(BeatDAOImpl.class);

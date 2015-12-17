@@ -12,6 +12,8 @@ import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.ScaleDAO;
@@ -20,6 +22,8 @@ import com.kiluet.jguitar.dao.model.Scale;
 import com.kiluet.jguitar.dao.model.ScaleType;
 import com.kiluet.jguitar.dao.model.Scale_;
 
+@Component
+@Transactional(readOnly = true)
 public class ScaleDAOImpl extends BaseDAOImpl<Scale, Long> implements ScaleDAO {
 
     private final Logger logger = LoggerFactory.getLogger(ScaleDAOImpl.class);

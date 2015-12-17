@@ -13,6 +13,8 @@ import javax.persistence.criteria.Root;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.NoteDAO;
@@ -21,6 +23,8 @@ import com.kiluet.jguitar.dao.model.Beat_;
 import com.kiluet.jguitar.dao.model.Note;
 import com.kiluet.jguitar.dao.model.Note_;
 
+@Component
+@Transactional(readOnly = true)
 public class NoteDAOImpl extends BaseDAOImpl<Note, Long>implements NoteDAO {
 
     private final Logger logger = LoggerFactory.getLogger(NoteDAOImpl.class);

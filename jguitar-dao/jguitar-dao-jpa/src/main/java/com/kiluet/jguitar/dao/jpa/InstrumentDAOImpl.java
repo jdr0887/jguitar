@@ -7,11 +7,15 @@ import javax.persistence.TypedQuery;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kiluet.jguitar.dao.InstrumentDAO;
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.model.Instrument;
 
+@Component
+@Transactional(readOnly = true)
 public class InstrumentDAOImpl extends BaseDAOImpl<Instrument, Long>implements InstrumentDAO {
 
     private final Logger logger = LoggerFactory.getLogger(InstrumentDAOImpl.class);

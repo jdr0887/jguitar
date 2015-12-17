@@ -6,11 +6,15 @@ import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.MeasureDAO;
 import com.kiluet.jguitar.dao.model.Measure;
 
+@Component
+@Transactional(readOnly = true)
 public class MeasureDAOImpl extends BaseDAOImpl<Measure, Long> implements MeasureDAO {
 
     private final Logger logger = LoggerFactory.getLogger(MeasureDAOImpl.class);

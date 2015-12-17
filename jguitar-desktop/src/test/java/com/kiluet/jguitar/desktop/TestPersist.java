@@ -10,12 +10,12 @@ import java.util.concurrent.Executors;
 import org.junit.Test;
 
 import com.kiluet.jguitar.InstrumentsPersistRunnable;
-import com.kiluet.jguitar.PentatonicScalesPersistRunnable;
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.JGuitarDAOManager;
 import com.kiluet.jguitar.dao.model.KeyType;
 import com.kiluet.jguitar.dao.model.Scale;
 import com.kiluet.jguitar.dao.model.ScaleType;
+import com.kiluet.jguitar.scales.pentatonic.PentatonicScalesPersistFirstPositionRunnable;
 
 public class TestPersist {
 
@@ -25,7 +25,7 @@ public class TestPersist {
         try {
             ExecutorService es = Executors.newSingleThreadExecutor();
             es.submit(new InstrumentsPersistRunnable()).get();
-            es.submit(new PentatonicScalesPersistRunnable()).get();
+            es.submit(new PentatonicScalesPersistFirstPositionRunnable()).get();
             es.shutdown();
         } catch (InterruptedException e) {
             e.printStackTrace();

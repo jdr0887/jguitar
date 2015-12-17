@@ -9,10 +9,20 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kiluet.jguitar.HeptatonicScalesPersistRunnable;
 import com.kiluet.jguitar.InstrumentsPersistRunnable;
-import com.kiluet.jguitar.PentatonicScalesPersistRunnable;
 import com.kiluet.jguitar.TemplatePersistRunnable;
+import com.kiluet.jguitar.scales.heptatonic.HeptatonicScalesPersistFifthPositionRunnable;
+import com.kiluet.jguitar.scales.heptatonic.HeptatonicScalesPersistFirstPositionRunnable;
+import com.kiluet.jguitar.scales.heptatonic.HeptatonicScalesPersistFourthPositionRunnable;
+import com.kiluet.jguitar.scales.heptatonic.HeptatonicScalesPersistSecondPositionRunnable;
+import com.kiluet.jguitar.scales.heptatonic.HeptatonicScalesPersistSeventhPositionRunnable;
+import com.kiluet.jguitar.scales.heptatonic.HeptatonicScalesPersistSixthPositionRunnable;
+import com.kiluet.jguitar.scales.heptatonic.HeptatonicScalesPersistThirdPositionRunnable;
+import com.kiluet.jguitar.scales.pentatonic.PentatonicScalesPersistFifthPositionRunnable;
+import com.kiluet.jguitar.scales.pentatonic.PentatonicScalesPersistFirstPositionRunnable;
+import com.kiluet.jguitar.scales.pentatonic.PentatonicScalesPersistFourthPositionRunnable;
+import com.kiluet.jguitar.scales.pentatonic.PentatonicScalesPersistSecondPositionRunnable;
+import com.kiluet.jguitar.scales.pentatonic.PentatonicScalesPersistThirdPositionRunnable;
 
 import javafx.animation.FadeTransition;
 import javafx.concurrent.Task;
@@ -56,11 +66,22 @@ public class SplashController extends Pane implements Initializable {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                ExecutorService es = Executors.newSingleThreadExecutor();
-                es.submit(new InstrumentsPersistRunnable());
+                Executors.newSingleThreadExecutor().submit(new InstrumentsPersistRunnable()).get();
+                
+                ExecutorService es = Executors.newFixedThreadPool(4);
                 es.submit(new TemplatePersistRunnable());
-                es.submit(new HeptatonicScalesPersistRunnable());
-                es.submit(new PentatonicScalesPersistRunnable());
+                es.submit(new HeptatonicScalesPersistFirstPositionRunnable());
+                es.submit(new HeptatonicScalesPersistSecondPositionRunnable());
+                es.submit(new HeptatonicScalesPersistThirdPositionRunnable());
+                es.submit(new HeptatonicScalesPersistFourthPositionRunnable());
+                es.submit(new HeptatonicScalesPersistFifthPositionRunnable());
+                es.submit(new HeptatonicScalesPersistSixthPositionRunnable());
+                es.submit(new HeptatonicScalesPersistSeventhPositionRunnable());
+                es.submit(new PentatonicScalesPersistFirstPositionRunnable());
+                es.submit(new PentatonicScalesPersistSecondPositionRunnable());
+                es.submit(new PentatonicScalesPersistThirdPositionRunnable());
+                es.submit(new PentatonicScalesPersistFourthPositionRunnable());
+                es.submit(new PentatonicScalesPersistFifthPositionRunnable());
                 es.shutdown();
                 es.awaitTermination(10, TimeUnit.SECONDS);
                 updateProgress(1, 1);

@@ -67,7 +67,7 @@ public class SplashController extends Pane implements Initializable {
             @Override
             protected Void call() throws Exception {
                 Executors.newSingleThreadExecutor().submit(new InstrumentsPersistRunnable()).get();
-                
+
                 ExecutorService es = Executors.newFixedThreadPool(4);
                 es.submit(new TemplatePersistRunnable());
                 es.submit(new HeptatonicScalesPersistFirstPositionRunnable());
@@ -83,7 +83,7 @@ public class SplashController extends Pane implements Initializable {
                 es.submit(new PentatonicScalesPersistFourthPositionRunnable());
                 es.submit(new PentatonicScalesPersistFifthPositionRunnable());
                 es.shutdown();
-                es.awaitTermination(10, TimeUnit.SECONDS);
+                // es.awaitTermination(10, TimeUnit.SECONDS);
                 updateProgress(1, 1);
                 return null;
             }

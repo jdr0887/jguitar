@@ -21,23 +21,6 @@
   <build>
     <plugins>
       <plugin>
-	<groupId>org.codehaus.mojo</groupId>
-	<artifactId>jaxb2-maven-plugin</artifactId>
-	<executions>
-	  <execution>
-	    <id>schemagen</id>
-	    <goals>
-	      <goal>schemagen</goal>
-	    </goals>
-	  </execution>
-	</executions>
-	<configuration>
-	  <includes>
-	    <include>**/model/*.java</include>
-	  </includes>
-	</configuration>
-      </plugin>
-      <plugin>
 	<artifactId>maven-compiler-plugin</artifactId>
 	<configuration>
 	  <source>1.7</source>
@@ -78,35 +61,32 @@
 	</executions>
       </plugin>
       <plugin>
-	<groupId>org.codehaus.mojo</groupId>
-	<artifactId>openjpa-maven-plugin</artifactId>
-	<configuration>
-	  <schemaAction />
-	  <schemaFile>target/schema.xml</schemaFile>
-	  <sqlAction>build</sqlAction>    
-	  <sqlFile>target/create.sql</sqlFile>
-	  <includes>**/dao/model/*.class</includes>
-	  <addDefaultConstructor>true</addDefaultConstructor>
-	  <enforcePropertyRestrictions>true</enforcePropertyRestrictions>
-	</configuration>
-	<executions>
-	  <execution>
-	    <id>enhancer</id>
-	    <phase>process-classes</phase>
-	    <goals>
-	      <goal>enhance</goal>
-	      <goal>sql</goal>
-	      <goal>schema</goal>
-	    </goals>
-	  </execution>
-	</executions>	
+        <groupId>org.apache.openjpa</groupId>
+        <artifactId>openjpa-maven-plugin</artifactId>
+	<version>${openjpa.version}</version>	
+        <configuration>
+          <includes>com/kiluet/jguitar/dao/model/*.class</includes>
+          <addDefaultConstructor>true</addDefaultConstructor>
+          <enforcePropertyRestrictions>true</enforcePropertyRestrictions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>enhancer</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>enhance</goal>	      
+              <goal>sql</goal>
+	      <goal>schema</goal>	      
+            </goals>
+          </execution>
+        </executions>
 	<dependencies>
 	  <dependency>
 	    <groupId>org.apache.openjpa</groupId>
 	    <artifactId>openjpa</artifactId>
 	    <version>${openjpa.version}</version>
 	  </dependency>
-	</dependencies>
+	</dependencies>	
       </plugin>
       <plugin>
 	<groupId>org.apache.maven.plugins</groupId>

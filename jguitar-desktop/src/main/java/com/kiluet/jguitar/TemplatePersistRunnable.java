@@ -10,8 +10,10 @@ import com.kiluet.jguitar.dao.model.Song;
 import com.kiluet.jguitar.dao.model.Track;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @NoArgsConstructor
+@Slf4j
 public class TemplatePersistRunnable extends AbstractPersistRunnable {
 
     @Override
@@ -108,7 +110,7 @@ public class TemplatePersistRunnable extends AbstractPersistRunnable {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
     }

@@ -70,7 +70,7 @@ public class SplashController extends Pane implements Initializable {
                 try {
                     Executors.newSingleThreadExecutor().submit(new InstrumentsPersistRunnable()).get();
 
-                    ExecutorService es = Executors.newFixedThreadPool(1);
+                    ExecutorService es = Executors.newFixedThreadPool(2);
                     es.submit(new TemplatePersistRunnable());
                     es.submit(new HeptatonicScalesPersistFirstPositionRunnable());
                     es.submit(new HeptatonicScalesPersistSecondPositionRunnable());

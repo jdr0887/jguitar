@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.model.Beat;
 import com.kiluet.jguitar.dao.model.DurationType;
 import com.kiluet.jguitar.dao.model.Instrument;
@@ -119,8 +118,8 @@ public class PentatonicScalesPersistSecondPositionRunnable extends AbstractPenta
                 offset += 2;
 
             }
-        } catch (JGuitarDAOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
 

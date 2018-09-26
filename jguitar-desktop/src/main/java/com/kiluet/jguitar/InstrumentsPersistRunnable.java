@@ -9,8 +9,6 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.kiluet.jguitar.dao.model.Instrument;
 import com.kiluet.jguitar.dao.model.InstrumentString;

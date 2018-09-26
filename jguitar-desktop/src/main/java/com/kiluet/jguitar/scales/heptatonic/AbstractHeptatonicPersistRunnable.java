@@ -8,10 +8,11 @@ import com.kiluet.jguitar.dao.model.KeyType;
 
 public abstract class AbstractHeptatonicPersistRunnable extends AbstractPersistRunnable {
 
-    protected static final List<KeyType> keyTypeList = new LinkedList<KeyType>();
+    protected List<KeyType> keyTypeList;
 
     public AbstractHeptatonicPersistRunnable() {
         super();
+        keyTypeList = new LinkedList<KeyType>();
         keyTypeList.add(KeyType.E);
         keyTypeList.add(KeyType.F);
         keyTypeList.add(KeyType.G);

@@ -2,9 +2,9 @@ package com.kiluet.jguitar.desktop.components;
 
 import java.util.List;
 
+import com.kiluet.jguitar.MIDINumber2NoteConverter;
 import com.kiluet.jguitar.dao.model.InstrumentString;
 import com.kiluet.jguitar.dao.model.Measure;
-import com.kiluet.jguitar.util.MIDINumber2NoteConverter;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

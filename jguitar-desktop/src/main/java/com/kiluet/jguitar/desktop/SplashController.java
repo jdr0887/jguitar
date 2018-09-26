@@ -66,24 +66,32 @@ public class SplashController extends Pane implements Initializable {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                Executors.newSingleThreadExecutor().submit(new InstrumentsPersistRunnable()).get();
 
-                ExecutorService es = Executors.newFixedThreadPool(4);
-                es.submit(new TemplatePersistRunnable());
-                es.submit(new HeptatonicScalesPersistFirstPositionRunnable());
-                es.submit(new HeptatonicScalesPersistSecondPositionRunnable());
-                es.submit(new HeptatonicScalesPersistThirdPositionRunnable());
-                es.submit(new HeptatonicScalesPersistFourthPositionRunnable());
-                es.submit(new HeptatonicScalesPersistFifthPositionRunnable());
-                es.submit(new HeptatonicScalesPersistSixthPositionRunnable());
-                es.submit(new HeptatonicScalesPersistSeventhPositionRunnable());
-                es.submit(new PentatonicScalesPersistFirstPositionRunnable());
-                es.submit(new PentatonicScalesPersistSecondPositionRunnable());
-                es.submit(new PentatonicScalesPersistThirdPositionRunnable());
-                es.submit(new PentatonicScalesPersistFourthPositionRunnable());
-                es.submit(new PentatonicScalesPersistFifthPositionRunnable());
-                es.shutdown();
-                // es.awaitTermination(10, TimeUnit.SECONDS);
+                try {
+                    Executors.newSingleThreadExecutor().submit(new InstrumentsPersistRunnable()).get();
+
+                    ExecutorService es = Executors.newFixedThreadPool(1);
+                    es.submit(new TemplatePersistRunnable());
+                    es.submit(new HeptatonicScalesPersistFirstPositionRunnable());
+                    es.submit(new HeptatonicScalesPersistSecondPositionRunnable());
+                    es.submit(new HeptatonicScalesPersistThirdPositionRunnable());
+                    es.submit(new HeptatonicScalesPersistFourthPositionRunnable());
+                    es.submit(new HeptatonicScalesPersistFifthPositionRunnable());
+                    es.submit(new HeptatonicScalesPersistSixthPositionRunnable());
+                    es.submit(new HeptatonicScalesPersistSeventhPositionRunnable());
+                    es.submit(new PentatonicScalesPersistFirstPositionRunnable());
+                    es.submit(new PentatonicScalesPersistSecondPositionRunnable());
+                    es.submit(new PentatonicScalesPersistThirdPositionRunnable());
+                    es.submit(new PentatonicScalesPersistFourthPositionRunnable());
+                    es.submit(new PentatonicScalesPersistFifthPositionRunnable());
+
+                    es.shutdown();
+                    if (!es.awaitTermination(10, TimeUnit.SECONDS)) {
+                        es.shutdownNow();
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
                 updateProgress(1, 1);
                 return null;
             }
@@ -92,6 +100,8 @@ public class SplashController extends Pane implements Initializable {
         progressBar.progressProperty().bind(task.progressProperty());
 
         task.stateProperty().addListener((observableValue, oldState, newState) -> {
+            logger.info("oldstate: {}", oldState);
+            logger.info("newstate: {}", newState);
             if (newState == Worker.State.SUCCEEDED) {
                 progressBar.progressProperty().unbind();
                 progressBar.setProgress(1);

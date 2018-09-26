@@ -3,8 +3,6 @@ package com.kiluet.jguitar.scales.pentatonic;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.model.Beat;
@@ -16,22 +14,20 @@ import com.kiluet.jguitar.dao.model.Scale;
 import com.kiluet.jguitar.dao.model.ScaleType;
 import com.kiluet.jguitar.dao.model.Track;
 
-public class PentatonicScalesPersistFirstPositionRunnable extends AbstractPentatonicPersistRunnable {
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-    private static final Logger logger = LoggerFactory.getLogger(PentatonicScalesPersistFirstPositionRunnable.class);
+@NoArgsConstructor
+@Slf4j
+public class PentatonicScalesPersistFirstPositionRunnable extends AbstractPentatonicPersistRunnable {
 
     @Override
     public String getName() {
         return "Pentatonic Scales";
     }
 
-    public PentatonicScalesPersistFirstPositionRunnable() {
-        super();
-    }
-
     @Override
     public void run() {
-        logger.info("ENTERING run()");
         try {
             int offset = 0;
 
@@ -47,9 +43,9 @@ public class PentatonicScalesPersistFirstPositionRunnable extends AbstractPentat
 
                 List<Scale> persistedScales = daoMgr.getDaoBean().getScaleDAO().findByExample(scale);
                 if (CollectionUtils.isNotEmpty(persistedScales)) {
-                    return;
+                    continue;
                 }
-                logger.info("Creating...{}", scale.toString());
+                log.info(scale.toString());
 
                 Instrument instrument = daoMgr.getDaoBean().getInstrumentDAO().findByProgram(27);
                 Track track = createTrack(1, instrument);

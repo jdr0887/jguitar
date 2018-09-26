@@ -15,6 +15,7 @@ import com.kiluet.jguitar.dao.JGuitarDAOManager;
 import com.kiluet.jguitar.dao.model.KeyType;
 import com.kiluet.jguitar.dao.model.Scale;
 import com.kiluet.jguitar.dao.model.ScaleType;
+import com.kiluet.jguitar.dao.model.Song;
 import com.kiluet.jguitar.scales.pentatonic.PentatonicScalesPersistFirstPositionRunnable;
 
 public class TestPersist {
@@ -40,6 +41,15 @@ public class TestPersist {
         } catch (JGuitarDAOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Test
+    public void testGetTemplate() throws Exception {
+
+        JGuitarDAOManager daoMgr = JGuitarDAOManager.getInstance();
+        List<Song> songs = daoMgr.getDaoBean().getSongDAO().findByTitle("Template");
+        assertTrue(songs != null);
 
     }
 

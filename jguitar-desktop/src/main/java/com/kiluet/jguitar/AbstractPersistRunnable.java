@@ -1,5 +1,9 @@
 package com.kiluet.jguitar;
 
+import java.util.ArrayList;
+
+import org.apache.commons.collections.CollectionUtils;
+
 import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.JGuitarDAOManager;
 import com.kiluet.jguitar.dao.model.Beat;
@@ -24,6 +28,9 @@ public abstract class AbstractPersistRunnable implements Runnable {
     protected Track createTrack(Song song, Integer number, Instrument instrument) throws JGuitarDAOException {
         Track track = new Track(song, instrument, number);
         track.setId(daoMgr.getDaoBean().getTrackDAO().save(track));
+        if (CollectionUtils.isEmpty(song.getTracks())) {
+            song.setTracks(new ArrayList<>());
+        }
         song.getTracks().add(track);
         return track;
     }
@@ -39,6 +46,9 @@ public abstract class AbstractPersistRunnable implements Runnable {
     protected Measure createMeasure(Track track, Integer number) throws JGuitarDAOException {
         Measure measure = new Measure(track, MeterType.COMMON, 120, number);
         measure.setId(daoMgr.getDaoBean().getMeasureDAO().save(measure));
+        if (CollectionUtils.isEmpty(track.getMeasures())) {
+            track.setMeasures(new ArrayList<>());
+        }
         track.getMeasures().add(measure);
         return measure;
     }
@@ -46,6 +56,9 @@ public abstract class AbstractPersistRunnable implements Runnable {
     protected Beat createBeat(Measure measure, DurationType durationType, Integer number) throws JGuitarDAOException {
         Beat beat = new Beat(measure, durationType, number);
         beat.setId(daoMgr.getDaoBean().getBeatDAO().save(beat));
+        if (CollectionUtils.isEmpty(measure.getBeats())) {
+            measure.setBeats(new ArrayList<>());
+        }
         measure.getBeats().add(beat);
         return beat;
     }
@@ -60,6 +73,10 @@ public abstract class AbstractPersistRunnable implements Runnable {
         }
         Note note = new Note(beat, string, value, 200);
         note.setId(daoMgr.getDaoBean().getNoteDAO().save(note));
+        if (CollectionUtils.isEmpty(beat.getNotes())) {
+            beat.setNotes(new ArrayList<>());
+        }
+
         beat.getNotes().add(note);
     }
 

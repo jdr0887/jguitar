@@ -49,8 +49,8 @@ public class MeasurePane extends GridPane {
             for (InstrumentString instrumentString : instrumentStrings) {
 
                 StackPane stackPane = new StackPane();
-                stackPane.setId(String.format("StackPane_%d_%d_%d_%d", measure.getTrack().getId(), measure.getNumber(),
-                        beat.getNumber(), instrumentString.getString()));
+                stackPane.setId(String.format("StackPane_%d_%d_%d_%d", measure.getTrack().getId(), measure.getNumber(), beat.getNumber(),
+                        instrumentString.getString()));
 
                 // -fx-border-color: red;
                 stackPane.setMinHeight(18);
@@ -81,8 +81,8 @@ public class MeasurePane extends GridPane {
 
                 final Note finalNote = note;
                 NoteTextField noteTextField = new NoteTextField(note);
-                noteTextField.setId(String.format("NoteTextField_%d_%d_%d_%d", measure.getTrack().getId(),
-                        measure.getNumber(), beat.getNumber(), instrumentString.getString()));
+                noteTextField.setId(String.format("NoteTextField_%d_%d_%d_%d", measure.getTrack().getId(), measure.getNumber(),
+                        beat.getNumber(), instrumentString.getString()));
                 noteTextField.focusedProperty().addListener(e -> {
                     jguitarController.setSelectedNote(finalNote);
                     switch (beat.getDuration()) {
@@ -120,13 +120,11 @@ public class MeasurePane extends GridPane {
                             case RIGHT:
                                 String rightOfNoteTextFieldId = null;
                                 if (beat.getNumber() == measure.getBeats().size()) {
-                                    rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
-                                            measure.getTrack().getId(), measure.getNumber() + 1, 1,
-                                            instrumentString.getString());
+                                    rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, measure.getTrack().getId(),
+                                            measure.getNumber() + 1, 1, instrumentString.getString());
                                 } else {
-                                    rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
-                                            measure.getTrack().getId(), measure.getNumber(), beat.getNumber() + 1,
-                                            instrumentString.getString());
+                                    rightOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, measure.getTrack().getId(),
+                                            measure.getNumber(), beat.getNumber() + 1, instrumentString.getString());
                                 }
                                 logger.info(rightOfNoteTextFieldId);
                                 proximalNoteTextField = (NoteTextField) this.getParent().lookup(rightOfNoteTextFieldId);
@@ -135,28 +133,24 @@ public class MeasurePane extends GridPane {
                                 String leftOfNoteTextFieldId = null;
                                 if (measure.getNumber() > 1 && beat.getNumber() == 1) {
                                     Measure pMeasure = measure.getTrack().getMeasures().get(measure.getNumber() - 2);
-                                    leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
-                                            measure.getTrack().getId(), pMeasure.getNumber(),
-                                            pMeasure.getBeats().size(), instrumentString.getString());
+                                    leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, measure.getTrack().getId(),
+                                            pMeasure.getNumber(), pMeasure.getBeats().size(), instrumentString.getString());
                                 } else {
-                                    leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
-                                            measure.getTrack().getId(), measure.getNumber(), beat.getNumber() - 1,
-                                            instrumentString.getString());
+                                    leftOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, measure.getTrack().getId(),
+                                            measure.getNumber(), beat.getNumber() - 1, instrumentString.getString());
                                 }
                                 logger.info(leftOfNoteTextFieldId);
                                 proximalNoteTextField = (NoteTextField) this.getParent().lookup(leftOfNoteTextFieldId);
                                 break;
                             case UP:
-                                String upOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
-                                        measure.getTrack().getId(), measure.getNumber(), beat.getNumber(),
-                                        instrumentString.getString() - 1);
+                                String upOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, measure.getTrack().getId(),
+                                        measure.getNumber(), beat.getNumber(), instrumentString.getString() - 1);
                                 logger.info(upOfNoteTextFieldId);
                                 proximalNoteTextField = (NoteTextField) this.getParent().lookup(upOfNoteTextFieldId);
                                 break;
                             case DOWN:
-                                String downOfNoteTextFieldId = String.format(noteTextFieldLookupFormat,
-                                        measure.getTrack().getId(), measure.getNumber(), beat.getNumber(),
-                                        instrumentString.getString() + 1);
+                                String downOfNoteTextFieldId = String.format(noteTextFieldLookupFormat, measure.getTrack().getId(),
+                                        measure.getNumber(), beat.getNumber(), instrumentString.getString() + 1);
                                 logger.info(downOfNoteTextFieldId);
                                 proximalNoteTextField = (NoteTextField) this.getParent().lookup(downOfNoteTextFieldId);
                                 break;
@@ -175,8 +169,7 @@ public class MeasurePane extends GridPane {
                     noteTextField = (NoteTextField) stackPane.getChildren().get(1);
                     if (note.getValue() != null) {
                         noteTextField.setText(note.getValue().toString());
-                        if (beat.getNumber() == 1 && measure.getNumber() == 1
-                                && beat.getMeasure().getTrack().getNumber() == 1) {
+                        if (beat.getNumber() == 1 && measure.getNumber() == 1 && beat.getMeasure().getTrack().getNumber() == 1) {
                             Platform.runLater(() -> stackPane.getChildren().get(1).requestFocus());
                         }
                     }

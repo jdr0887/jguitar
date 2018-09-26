@@ -1,26 +1,26 @@
 package com.kiluet.jguitar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Synthesizer;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kiluet.jguitar.dao.JGuitarDAOException;
 import com.kiluet.jguitar.dao.model.Instrument;
 import com.kiluet.jguitar.dao.model.InstrumentString;
 
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@NoArgsConstructor
 public class InstrumentsPersistRunnable extends AbstractPersistRunnable {
-
-    private static final Logger logger = LoggerFactory.getLogger(InstrumentsPersistRunnable.class);
-
-    public InstrumentsPersistRunnable() {
-        super();
-    }
 
     @Override
     public String getName() {
@@ -29,87 +29,110 @@ public class InstrumentsPersistRunnable extends AbstractPersistRunnable {
 
     @Override
     public void run() {
-        logger.info("ENTERING run()");
-        try {
-            createInstruments();
-        } catch (JGuitarDAOException e) {
-            e.printStackTrace();
-        }
-    }
+        try (Synthesizer synthesizer = MidiSystem.getSynthesizer()) {
 
-    private void createInstruments() throws JGuitarDAOException {
+            List<javax.sound.midi.Instrument> instruments = Arrays.asList(synthesizer.getAvailableInstruments()).stream()
+                    .filter(a -> a.getName().toLowerCase().contains("guitar") && a.getPatch().getBank() == 0).collect(Collectors.toList());
 
-        try {
-            Synthesizer synthesizer = MidiSystem.getSynthesizer();
-            synthesizer.open();
-            javax.sound.midi.Instrument[] instruments = synthesizer.getAvailableInstruments();
-            for (javax.sound.midi.Instrument instrument : instruments) {
-                if (instrument.getPatch().getBank() == 0) {
-                    List<Instrument> foundInstruments = daoMgr.getDaoBean().getInstrumentDAO()
-                            .findByName(instrument.getName());
-                    if (CollectionUtils.isNotEmpty(foundInstruments)) {
-                        continue;
-                    }
-                    if (instrument.getName().toLowerCase().contains("guitar")) {
-                        Instrument jguitarInstrument = new Instrument(instrument.getName(),
-                                instrument.getPatch().getProgram());
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 6, 40));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 5, 45));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 4, 50));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 3, 55));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 2, 59));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 1, 64));
-                        daoMgr.getDaoBean().getInstrumentDAO().save(jguitarInstrument);
-                    }
+            if (CollectionUtils.isNotEmpty(instruments)) {
+                for (javax.sound.midi.Instrument instrument : instruments) {
 
-                    if (instrument.getName().toLowerCase().contains("bass")) {
-                        Instrument jguitarInstrument = new Instrument(instrument.getName(),
-                                instrument.getPatch().getProgram());
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 4, 28));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 3, 33));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 2, 38));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 1, 43));
-                        daoMgr.getDaoBean().getInstrumentDAO().save(jguitarInstrument);
-                    }
-
-                    if (instrument.getName().equalsIgnoreCase("cello")) {
-                        Instrument jguitarInstrument = new Instrument(instrument.getName(),
-                                instrument.getPatch().getProgram());
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 4, 36));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 3, 43));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 2, 50));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 1, 57));
-                        daoMgr.getDaoBean().getInstrumentDAO().save(jguitarInstrument);
-                    }
-
-                    if (instrument.getName().equalsIgnoreCase("violin")) {
-                        Instrument jguitarInstrument = new Instrument(instrument.getName(),
-                                instrument.getPatch().getProgram());
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 4, 55));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 3, 62));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 2, 69));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 1, 76));
-                        daoMgr.getDaoBean().getInstrumentDAO().save(jguitarInstrument);
-                    }
-
-                    if (instrument.getName().equalsIgnoreCase("viola")) {
-                        Instrument jguitarInstrument = new Instrument(instrument.getName(),
-                                instrument.getPatch().getProgram());
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 4, 48));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 3, 55));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 2, 62));
-                        jguitarInstrument.getStrings().add(new InstrumentString(jguitarInstrument, 1, 69));
+                    if (CollectionUtils.isEmpty(daoMgr.getDaoBean().getInstrumentDAO().findByName(instrument.getName()))) {
+                        Instrument jguitarInstrument = new Instrument(instrument.getName(), instrument.getPatch().getProgram());
+                        List<InstrumentString> instrumentStrings = new ArrayList<>();
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 6, 40));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 5, 45));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 4, 50));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 3, 55));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 2, 59));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 1, 64));
+                        jguitarInstrument.setStrings(instrumentStrings);
                         daoMgr.getDaoBean().getInstrumentDAO().save(jguitarInstrument);
                     }
 
                 }
             }
-            synthesizer.close();
 
-        } catch (MidiUnavailableException e) {
-            e.printStackTrace();
+            instruments = Arrays.asList(synthesizer.getAvailableInstruments()).stream()
+                    .filter(a -> a.getName().toLowerCase().contains("bass") && a.getPatch().getBank() == 0).collect(Collectors.toList());
+
+            if (CollectionUtils.isNotEmpty(instruments)) {
+                for (javax.sound.midi.Instrument instrument : instruments) {
+                    if (CollectionUtils.isEmpty(daoMgr.getDaoBean().getInstrumentDAO().findByName(instrument.getName()))) {
+                        Instrument jguitarInstrument = new Instrument(instrument.getName(), instrument.getPatch().getProgram());
+                        List<InstrumentString> instrumentStrings = new ArrayList<>();
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 4, 28));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 3, 33));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 2, 38));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 1, 43));
+                        jguitarInstrument.setStrings(instrumentStrings);
+                        daoMgr.getDaoBean().getInstrumentDAO().save(jguitarInstrument);
+                    }
+                }
+            }
+
+            instruments = Arrays.asList(synthesizer.getAvailableInstruments()).stream()
+                    .filter(a -> a.getName().toLowerCase().contains("cello") && a.getPatch().getBank() == 0).collect(Collectors.toList());
+
+            if (CollectionUtils.isNotEmpty(instruments)) {
+                for (javax.sound.midi.Instrument instrument : instruments) {
+                    if (CollectionUtils.isEmpty(daoMgr.getDaoBean().getInstrumentDAO().findByName(instrument.getName()))) {
+                        Instrument jguitarInstrument = new Instrument(instrument.getName(), instrument.getPatch().getProgram());
+                        List<InstrumentString> instrumentStrings = new ArrayList<>();
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 4, 36));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 3, 43));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 2, 50));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 1, 57));
+                        jguitarInstrument.setStrings(instrumentStrings);
+                        daoMgr.getDaoBean().getInstrumentDAO().save(jguitarInstrument);
+                    }
+                }
+            }
+
+            instruments = Arrays.asList(synthesizer.getAvailableInstruments()).stream()
+                    .filter(a -> a.getName().toLowerCase().contains("violin") && a.getPatch().getBank() == 0).collect(Collectors.toList());
+
+            if (CollectionUtils.isNotEmpty(instruments)) {
+                for (javax.sound.midi.Instrument instrument : instruments) {
+                    if (CollectionUtils.isEmpty(daoMgr.getDaoBean().getInstrumentDAO().findByName(instrument.getName()))) {
+                        Instrument jguitarInstrument = new Instrument(instrument.getName(), instrument.getPatch().getProgram());
+                        List<InstrumentString> instrumentStrings = new ArrayList<>();
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 4, 55));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 3, 62));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 2, 69));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 1, 76));
+                        jguitarInstrument.setStrings(instrumentStrings);
+                        daoMgr.getDaoBean().getInstrumentDAO().save(jguitarInstrument);
+                    }
+                }
+            }
+
+            instruments = Arrays.asList(synthesizer.getAvailableInstruments()).stream()
+                    .filter(a -> a.getName().toLowerCase().contains("viola") && a.getPatch().getBank() == 0).collect(Collectors.toList());
+
+            if (CollectionUtils.isNotEmpty(instruments)) {
+                for (javax.sound.midi.Instrument instrument : instruments) {
+                    if (CollectionUtils.isEmpty(daoMgr.getDaoBean().getInstrumentDAO().findByName(instrument.getName()))) {
+                        Instrument jguitarInstrument = new Instrument(instrument.getName(), instrument.getPatch().getProgram());
+                        List<InstrumentString> instrumentStrings = new ArrayList<>();
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 4, 48));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 3, 55));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 2, 62));
+                        instrumentStrings.add(new InstrumentString(jguitarInstrument, 1, 69));
+                        jguitarInstrument.setStrings(instrumentStrings);
+                        daoMgr.getDaoBean().getInstrumentDAO().save(jguitarInstrument);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
+    }
 
+    public static void main(String[] args) {
+        InstrumentsPersistRunnable runnable = new InstrumentsPersistRunnable();
+        runnable.run();
     }
 
 }

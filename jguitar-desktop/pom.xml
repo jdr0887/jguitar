@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
-      <groupId>com.kiluet.jguitar.jguitar-dao</groupId>
+      <groupId>com.kiluet.jguitar</groupId>
       <artifactId>jguitar-dao-jpa</artifactId>
     </dependency>
     <dependency>
@@ -24,7 +24,35 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-collections4</artifactId>
-    </dependency>          
+    </dependency>
+    <!-- <dependency> -->
+    <!--   <groupId>com.oracle</groupId> -->
+    <!--   <artifactId>javafx-base</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!--   <groupId>com.oracle</groupId> -->
+    <!--   <artifactId>javafx-controls</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!--   <groupId>com.oracle</groupId> -->
+    <!--   <artifactId>javafx-fxml</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!--   <groupId>com.oracle</groupId> -->
+    <!--   <artifactId>javafx-graphics</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!--   <groupId>com.oracle</groupId> -->
+    <!--   <artifactId>javafx-media</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!--   <groupId>com.oracle</groupId> -->
+    <!--   <artifactId>javafx-web</artifactId> -->
+    <!-- </dependency>       -->
+    <!-- <dependency> -->
+    <!--   <groupId>com.oracle</groupId> -->
+    <!--   <artifactId>javafx-swt</artifactId> -->
+    <!-- </dependency>           -->
   </dependencies>
   <build>
     <plugins>
